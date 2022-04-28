@@ -118,6 +118,20 @@ void cadastra_carro(carro *p_carro, int q){
     grava_carro(p_carro);
 }
 
+void consulta_carro(carro *p_carro, int tamanho, int numero){
+    for(int i = 0; i < tamanho; i++,p_carro++){
+        if(numero==0){
+            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f", p_carro->reg_car);
+            //TODO: status
+        }
+        else{
+        if(p_carro->reg_car == numero){
+             printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f", p_carro->reg_car);
+        }
+    }
+    }
+}
+
 int main(){
     setlocale(LC_ALL,"");
     carro *p_carro = NULL;
