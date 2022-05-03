@@ -1,3 +1,8 @@
+//Gabriel Rocha Monaco RA 171092
+//Igor Dantas RA 190721
+//João Pedro Abrantes RA 190846
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -99,6 +104,7 @@ void grava_carro(carro *p)
 //* Aloca memória para o ponteiro do carro
 //@param **p Endereço do pointeiro de carro
 //@param q Quantidade de carros
+
 void aloca_carro(carro **p, int q)
 {
     if (((*p = (carro *)realloc(*p, q * sizeof(carro))) == NULL))
@@ -134,14 +140,15 @@ void cadastra_carro(carro *p_carro, int q)
 
 void consulta_total(carro *p_carro)
 {
-
+	int i;
     FILE *ar = NULL;
     int numero_de_carro = verifica_arquivo();
+    system("cls");
     if ((ar = fopen("carro.bin", "rb")) == NULL)
         printf("\nErro");
     else
     {
-        for (int i = 0; i < numero_de_carro; i++)
+        for (i = 0; i < numero_de_carro; i++)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
@@ -155,6 +162,7 @@ void consulta_total(carro *p_carro)
 void consulta_se_tem_livre_por_tipo(carro *p_carro){
     system("cls");
     char op;
+    int i;
     printf("Selecione o tamanho: ");
     scanf("%c", &op);
     fflush(stdin);
@@ -164,43 +172,76 @@ void consulta_se_tem_livre_por_tipo(carro *p_carro){
         printf("\nErro");
     else
     {
-        for (int i = 0; i < numero_de_carro; i++)
+        for (i = 0; i < numero_de_carro; i++)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
             if(p_carro->tipo==op){
-                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
+                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
             }
         }
     }
+}
+
+void grava_cliente(cliente *p)
+{
+    FILE *fptr = NULL;
+    if ((fptr = fopen("cliente.bin", "ab")) == NULL)
+        printf("\nErro ao abrir o arquivo");
+    else
+        fwrite(p, sizeof(cliente), 1, fptr);
+    fclose(fptr); // fora do ELSE por conta do ab
+} // 
+
+void aloca_cliente(cliente **p, int q)
+{
+    if (((*p = (cliente *)realloc(*p, q * sizeof(cliente))) == NULL))
+        exit(1);
+}
+
+void cadastro_cliente(int op_carro, cliente *p_cli) { 
+	int n; 
+	grava_cliente(p_cli);
+	p_cli->reg_cli = ++n;
+    printf("\nRegistro: %i\n", p_cli->reg_car);
+    printf("\nNome: ");
+    gets(p_cli->nome);
+    printf("\nCPF: ");
+  	scanf("%s", p_cli->CPF);
 }
 
 int main()
 {
     setlocale(LC_ALL, "");
     carro *p_carro = NULL;
+    cliente *p_cli = NULL;
 
-    int op;
+    int op, op_carro;
     info_carro a;
     int numero;
     do
     {
-        printf("\n[1]Cadastrar carro\n[2]Consulta Total\n[3]Consulta Parcial\n[4]Fim\nOpcao:");
+        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Fim\nOpcao:");
         scanf("%i", &op);
         fflush(stdin);
         switch (op)
         {
         case 1:
-            strcpy(a.local_ret, "ABC!");
+            strcpy(a.local_ret, "\nCadastro");
             printf("%s\n", a.local_ret);
             aloca_carro(&p_carro, 1);
             cadastra_carro(p_carro, 1);
             break;
         case 2:
             consulta_total(p_carro);
+            printf("Digite o registro do carro que deseja alugar: ");
+            scanf("%i", &op_carro);
+			system("cls");
+			cadastro_cliente(op_carro, p_cli);
             break;
         case 3:
             consulta_se_tem_livre_por_tipo(p_carro);
+            system("pause");
             break;
         } // switch
 
