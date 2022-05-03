@@ -8,6 +8,15 @@
 #include <locale.h>
 #include <string.h>
 
+/* 
+    Verificar se CPF é permitido - baixa prioridade
+    Alterar o status do carro alugado - Alta prioridade
+    Consulta de cliente - Média prioridade (Bom para ver se o carro foi alugado)
+ 
+    Acho que não precisa altrar os valores do arquivo salvo por enquanto
+ */
+
+
 //* Informações do carro alugado e seu cliente
 //@param sigla A - Alugado R - Reservado
 //@param local_ret[20] Local de retirada
