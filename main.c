@@ -8,7 +8,7 @@
 #include <locale.h>
 #include <string.h>
 
-//* Informações do cliente
+//* Informações do carro alugado e seu cliente
 //@param sigla A - Alugado R - Reservado
 //@param local_ret[20] Local de retirada
 //@param reg_cli Número do cliente
@@ -29,6 +29,12 @@ typedef struct info_cliente
     char local_dev[20];
 } info_cliente;
 
+//Informações do cliente
+//@param reg_cli Numero do cliente
+//@param nome Nome do cliente
+//@param CPF CPF do cliente
+//@param sigla Sigla do cliente
+//@param reg_car Numero do carro alugado
 typedef struct cliente{
     int reg_cli;
     char nome[80];
@@ -104,7 +110,6 @@ void grava_carro(carro *p)
 //* Aloca memória para o ponteiro do carro
 //@param **p Endereço do pointeiro de carro
 //@param q Quantidade de carros
-
 void aloca_carro(carro **p, int q)
 {
     if (((*p = (carro *)realloc(*p, q * sizeof(carro))) == NULL))
@@ -138,6 +143,9 @@ void cadastra_carro(carro *p_carro, int q)
     grava_carro(p_carro);
 }
 
+//Verifica todos os carros cadastrados.
+//Faz um print de todos os carros cadastrados no sistema
+//@param p_carro Ponteiro de carros utilizado
 void consulta_total(carro *p_carro)
 {
 	int i;
@@ -158,7 +166,9 @@ void consulta_total(carro *p_carro)
     }
 }
 
-
+//Verifica se existe carro livre pelo tipo dele.
+//Faz print de todos os carros livres.
+//@param p_carro Ponteiro de carros utilizado
 void consulta_se_tem_livre_por_tipo(carro *p_carro){
     system("cls");
     char op;
@@ -183,6 +193,8 @@ void consulta_se_tem_livre_por_tipo(carro *p_carro){
     }
 }
 
+//Salva o cliente em um arquivo .bin
+//@param p Ponteiros de clientes utilizado
 void grava_cliente(cliente *p)
 {
     FILE *fptr = NULL;
@@ -191,14 +203,21 @@ void grava_cliente(cliente *p)
     else
         fwrite(p, sizeof(cliente), 1, fptr);
     fclose(fptr); // fora do ELSE por conta do ab
-} // 
+}
 
+//Aloca memória para o ponteiro de cliente.
+//@param p Endereço do ponteiro de Cliente utilizado
+//@param q Tamanho desejado do ponteiro
 void aloca_cliente(cliente **p, int q)
 {
     if (((*p = (cliente *)realloc(*p, q * sizeof(cliente))) == NULL))
         exit(1);
 }
 
+
+//Cadastra o cliente com o carro desejado.
+//@param op_carro Numero de registro do carro
+//@param p_cli Ponteiro de Cliente utilizado
 void cadastro_cliente(int op_carro, cliente *p_cli) { 
 	int n; 
 	grava_cliente(p_cli);
