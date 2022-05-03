@@ -228,6 +228,13 @@ void cadastro_cliente(int op_carro, cliente *p_cli) {
   	scanf("%s", p_cli->CPF);
     p_cli->reg_car = op_carro;
 
+    /* 
+       Acho que precisa setar os valores do carro.
+       Não sei como mas precisamos pegar o carro com o numero de registro,
+       alterar o union para info_cliente, colocar os valores certos e
+       finalmente salvar e sobrescrever os valores antigos.
+     */
+
     grava_cliente(p_cli);
 }
 
