@@ -220,13 +220,15 @@ void aloca_cliente(cliente **p, int q)
 //@param p_cli Ponteiro de Cliente utilizado
 void cadastro_cliente(int op_carro, cliente *p_cli) { 
 	int n; 
-	grava_cliente(p_cli);
 	p_cli->reg_cli = ++n;
     printf("\nRegistro: %i\n", p_cli->reg_car);
     printf("\nNome: ");
     gets(p_cli->nome);
     printf("\nCPF: ");
   	scanf("%s", p_cli->CPF);
+    p_cli->reg_car = op_carro;
+
+    grava_cliente(p_cli);
 }
 
 int main()
