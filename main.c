@@ -93,9 +93,88 @@ typedef struct vip{
     char tipo;
 }vip;
 
+int verifica_arquivo_carro();
+int verifica_arquivo_cliente();
+void aloca_carro(carro **p, int q);
+void cadastra_carro(carro *p_carro, int q);
+void consulta_total(carro *p_carro);
+void consulta_se_tem_livre_por_tipo(carro *p_carro);
+void grava_cliente(cliente *p, char *str, int pos);
+void aloca_cliente(cliente **p, int q);
+void grava_carro(carro *p,char *str,int pos);
+int busca(carro *p_carro,int num_reg);
+void altera(carro *p_carro, int reg_car, cliente *p_cli);
+int busca_vago_cliente(cliente *p_cli, int qtde);
+void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro);
+void consulta_de_teste(carro *p_carro);
+void gravaClienteAntigo(vip *p_vip, char *str,int pos);
+void aloca_vip(vip **p, int q);
+int verifica_arquivo_vip();
+void deletaCliente(cliente *p_cli, vip *p_vip, int pos);
+void consulta_total_cliente(cliente *p_cliente);
+int busca_cpf(cliente *p_cli,char *cpf_devolucao);
+int buscaCarroPorRegCli(carro *p_carro, int reg_cli);
+int devolucao(carro *p_carro, cliente *p_cli);
+void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos);
+
+int main()
+{
+    setlocale(LC_ALL, "");
+    carro *p_carro = NULL;
+    cliente *p_cli = NULL;
+    vip *p_vip = NULL;
+    
+    aloca_carro(&p_carro, 1);
+    aloca_cliente(&p_cli,1);
+    aloca_vip(&p_vip, 1);
+
+    int op, op_carro;
+    info_carro a;
+    int numero;
+    do
+    {
+        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Fim\nOpcao:");
+        scanf("%i", &op);
+        fflush(stdin);
+        switch (op)
+        {
+        case 1:
+            strcpy(a.local_ret, "\nCadastro");
+            printf("%s\n", a.local_ret);
+            cadastra_carro(p_carro, 1);
+            break;
+        case 2:
+            consulta_total(p_carro);
+            printf("\nDigite o registro do carro que deseja alugar: ");
+            scanf("%i", &op_carro);
+            fflush(stdin);
+            //printf("Antes de cadastro cliente");
+			cadastro_cliente(op_carro, p_cli,p_carro);
+            break;
+        case 3:
+            consulta_se_tem_livre_por_tipo(p_carro);
+            system("pause");
+            break;
+        case 9:
+            consulta_de_teste(p_carro);
+            break;
+        case 10:
+            consulta_total_cliente(p_cli);
+            break;
+        case 11:
+            int pos = devolucao(p_carro, p_cli);
+            deletaCliente(p_cli, p_vip, pos);
+            break;
+        } // switch
+
+    } while (op != 4);
+    system("pause");
+    return 1;
+}
+
 // Verifica o numero de carros cadastrados.
-//@return número da numeração do ultimo carro,
-// caso não existe arquivo.bin, o retorno é 0.
+//@return Número do registro do ultimo carro,
+// caso não existe carro.bin, o retorno é 0.
 int verifica_arquivo_carro()
 {
     long int cont = 0;
@@ -111,6 +190,9 @@ int verifica_arquivo_carro()
     }
 }
 
+//Verifica o número de clientes cadastrados.
+//@return Número do registro do ultimo cliente,
+//caso não exista cliente.bin o retorno é 0.
 int verifica_arquivo_cliente()
 {
     long int cont = 0;
@@ -126,17 +208,6 @@ int verifica_arquivo_cliente()
     }
 }
 
-// Grava os carros do ponteiro de carros em um arquivo .bin
-//@param *p Ponteiro de carros a ser salvado
-void grava_carro(carro *p)
-{
-    FILE *fptr = NULL;
-    if ((fptr = fopen("carro.bin", "ab")) == NULL)
-        printf("\nErro ao abrir o arquivo");
-    else
-        fwrite(p, sizeof(carro), 1, fptr);
-    fclose(fptr); // fora do ELSE por conta do ab
-} // grava_hospede
 
 //* Aloca memória para o ponteiro do carro
 //@param **p Endereço do pointeiro de carro
@@ -171,7 +242,7 @@ void cadastra_carro(carro *p_carro, int q)
     p_carro->status.car.sigla = 'L';
     strcpy(p_carro->status.car.local_ret, "Sorocaba");
 
-    grava_carro(p_carro);
+    grava_carro(p_carro,"ab", 1);
 }
 
 //Verifica todos os carros cadastrados.
@@ -250,7 +321,7 @@ void aloca_cliente(cliente **p, int q)
         exit(1);
 }
 
-void grava(carro *p,char *str,int pos)
+void grava_carro(carro *p,char *str,int pos)
 {
 FILE *fptr=NULL;
 if((fptr=fopen("carro.bin",str))==NULL)
@@ -317,7 +388,7 @@ void altera(carro *p_carro, int reg_car, cliente *p_cli){
     //como a sigla está no valor antigo, a gente volta para o valor novo
     printf("\nReg antes de gravar: %i\n", p_carro->reg_car);
     p_carro->status.dados[0].sigla = valor_da_sigla_anterior;
-    grava(p_carro, "rb+",pos);
+    grava_carro(p_carro, "rb+",pos);
 }
 
 int busca_vago_cliente(cliente *p_cli, int qtde){
@@ -371,7 +442,7 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     p_cli->reg_car = op_carro;
     printf("\nModelo: %s",p_carro->modelo);
     printf("\nSigla: %c" ,p_carro->status.car.sigla);
-
+    
 
     //João, aqui que tem que fazer a lógica das siglas
     if((p_carro->status.car.sigla) == 'L')
@@ -381,8 +452,13 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
         else {
             printf("\nCarro ja reservado!");
             return;
-        }
+    }
 
+    if(p_carro->status.car.sigla == 'A'){
+        colocaDadosDeCarro(p_carro,p_cli, 0);
+    }else{
+        colocaDadosDeCarro(p_carro,p_cli, 1);
+    }
     //p_carro->status.car.sigla='A';
     //printf("\nSigla: %c" ,p_carro->status.car.sigla);    
     //A maracutaia está na função salvar
@@ -545,64 +621,40 @@ int devolucao(carro *p_carro, cliente *p_cli) {
 	printf("Informe seu CPF: ");
 	scanf("%s", &cpf_devolucao);
 	int lugarDoCliente = busca_cpf(p_cli, cpf_devolucao);
-    p_carro->status.car.sigla = 'L';
     buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
+    p_carro->status.car.sigla = 'L';
     altera(p_carro, p_cli->reg_car, p_cli);
     return lugarDoCliente;
 }
 
-int main()
-{
-    setlocale(LC_ALL, "");
-    carro *p_carro = NULL;
-    cliente *p_cli = NULL;
-    vip *p_vip = NULL;
-    
-    aloca_carro(&p_carro, 1);
-    aloca_cliente(&p_cli,1);
-    aloca_vip(&p_vip, 1);
+void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
+    if (pos==0) p_carro->status.dados[pos].sigla = 'A';
+    if (pos==1) p_carro->status.dados[pos].sigla = 'R';
+    p_carro->status.dados[pos].reg_cli = p_cli->reg_cli;
 
-    int op, op_carro;
-    info_carro a;
-    int numero;
-    do
-    {
-        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Fim\nOpcao:");
-        scanf("%i", &op);
-        fflush(stdin);
-        switch (op)
-        {
-        case 1:
-            strcpy(a.local_ret, "\nCadastro");
-            printf("%s\n", a.local_ret);
-            cadastra_carro(p_carro, 1);
-            break;
-        case 2:
-            consulta_total(p_carro);
-            printf("\nDigite o registro do carro que deseja alugar: ");
-            scanf("%i", &op_carro);
-            fflush(stdin);
-            //printf("Antes de cadastro cliente");
-			cadastro_cliente(op_carro, p_cli,p_carro);
-            break;
-        case 3:
-            consulta_se_tem_livre_por_tipo(p_carro);
-            system("pause");
-            break;
-        case 9:
-            consulta_de_teste(p_carro);
-            break;
-        case 10:
-            consulta_total_cliente(p_cli);
-            break;
-        case 11:
-            int pos = devolucao(p_carro, p_cli);
-            deletaCliente(p_cli, p_vip, pos);
-            break;
-        } // switch
+    int dia_ret;
+    printf("\nDia de retirada: ");
+    fflush(stdin);
+    scanf("%i", &dia_ret);
+    fflush(stdin);
+    p_carro->status.dados[pos].dia_ret = dia_ret;
 
-    } while (op != 4);
-    system("pause");
-    return 1;
-    return 1;
+    int mes_ret;
+    printf("\nMes de retirada: ");
+    scanf("%i", &mes_ret);
+    fflush(stdin);
+    p_carro->status.dados[pos].mes_ret = mes_ret;
+
+    int dia_dev;
+    printf("\nDia de devolucao: ");
+    scanf("%i", &dia_dev);
+    fflush(stdin);
+    p_carro->status.dados[pos].dia_dev = dia_dev;
+
+    int mes_dev;
+    printf("\nMes de devolucao: ");
+    scanf("%i", &mes_dev);
+    fflush(stdin);
+
+    p_carro->status.dados[pos].mes_dev = mes_dev;
 }
