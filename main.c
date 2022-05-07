@@ -262,7 +262,13 @@ void consulta_total(carro *p_carro)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
-            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
+            if(p_carro->status.car.sigla == 'L')
+            {
+                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
+            }else{
+                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
+                printf("Dia devolucao: %i / %i\n", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
+            }
 
         }
     }
@@ -432,6 +438,7 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     busca(p_carro, op_carro);
 
     p_cli->reg_car = op_carro;
+    p_cli->sigla = p_carro->tipo;
     printf("\nRegistro: %i\n", p_cli->reg_cli);
     printf("\nNome: ");
     gets(p_cli->nome);
