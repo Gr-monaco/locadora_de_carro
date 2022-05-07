@@ -329,6 +329,7 @@ void aloca_cliente(cliente **p, int q)
 
 void grava_carro(carro *p,char *str,int pos)
 {
+printf("\nSigla antes de salvar: %c\n", p->status.car.sigla);
 FILE *fptr=NULL;
 if((fptr=fopen("carro.bin",str))==NULL)
   printf("\nErro ao abrir o arquivo");
@@ -368,7 +369,6 @@ return achou;  //posicao do registro
 
 void altera(carro *p_carro, int reg_car, cliente *p_cli){
     //Pega o valor que está no ponteiro
-    char valor_da_sigla_anterior = p_carro->status.car.sigla;
 
     //A função busca altera o valor do ponteiro, mas o valor antigo está no p_carro
     //É preciso guardar os valores alterados antes porque a posição é essencial para 
@@ -393,7 +393,6 @@ void altera(carro *p_carro, int reg_car, cliente *p_cli){
 
     //como a sigla está no valor antigo, a gente volta para o valor novo
     printf("\nReg antes de gravar: %i\n", p_carro->reg_car);
-    p_carro->status.dados[0].sigla = valor_da_sigla_anterior;
     grava_carro(p_carro, "rb+",pos);
 }
 
@@ -454,11 +453,12 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     //João, aqui que tem que fazer a lógica das siglas
     if((p_carro->status.car.sigla) == 'L')
         p_carro->status.car.sigla = 'A';
-    else if((p_carro->status.car.sigla) == 'A')
+    else if((p_carro->status.car.sigla) == 'A'){
         p_carro->status.car.sigla = 'R';
-        else {
-            printf("\nCarro ja reservado!");
-            return;
+    }
+    else {
+        printf("\nCarro ja reservado!");
+        return;
     }
 
     if(p_carro->status.car.sigla == 'A'){
@@ -629,7 +629,37 @@ int devolucao(carro *p_carro, cliente *p_cli) {
 	scanf("%s", &cpf_devolucao);
 	int lugarDoCliente = busca_cpf(p_cli, cpf_devolucao);
     buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
-    p_carro->status.car.sigla = 'L';
+    printf("\nSigla do carro antes do if: %c", p_carro->status.car.sigla);
+
+    if(p_carro->status.car.sigla == 'R'){
+        printf("\nSigla do carro antes: %c", p_carro->status.car.sigla);
+        p_carro->status.car.sigla = 'A';
+        printf("\nSigla do carro depois: %c", p_carro->status.car.sigla);
+
+        p_carro->status.dados[0].dia_dev = p_carro->status.dados[1].dia_dev;
+        p_carro->status.dados[0].mes_dev = p_carro->status.dados[1].mes_dev;
+        strcpy(p_carro->status.dados[0].local_ret,p_carro->status.dados[1].local_ret);
+        strcpy(p_carro->status.dados[0].local_dev,p_carro->status.dados[1].local_dev);
+        p_carro->status.dados[0].dia_ret = p_carro->status.dados[1].dia_ret;
+        p_carro->status.dados[0].mes_ret = p_carro->status.dados[1].mes_ret;
+        p_carro->status.dados[0].reg_cli = p_carro->status.dados[1].reg_cli;
+        printf("\nSigla do carro antes do dados: %c", p_carro->status.car.sigla);
+
+        //A sigla está dando erro, parece que a sigla de dados[1] não recebe os valores
+        //p_carro->status.dados[0].sigla = p_carro->status.dados[1].sigla;
+
+        printf("\nSigla do carro depois do dados: %c", p_carro->status.car.sigla);
+
+    }
+    else
+    {
+        printf("Ta indo no L");
+        printf("\nSigla do carro antes: %c", p_carro->status.car.sigla);
+
+        p_carro->status.car.sigla = 'L';
+        printf("\nSigla do carro depois: %c", p_carro->status.car.sigla);
+
+    }
     altera(p_carro, p_cli->reg_car, p_cli);
     return lugarDoCliente;
 }
