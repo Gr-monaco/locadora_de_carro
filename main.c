@@ -86,10 +86,17 @@ typedef struct carro
     union estado status;
 } carro;
 
+typedef struct vip{
+    int reg_cli;
+    char nome[80];
+    char CPF[15];
+    char tipo;
+}vip;
+
 // Verifica o numero de carros cadastrados.
 //@return número da numeração do ultimo carro,
 // caso não existe arquivo.bin, o retorno é 0.
-int verifica_arquivo()
+int verifica_arquivo_carro()
 {
     long int cont = 0;
     FILE *fptr = NULL;
@@ -99,6 +106,21 @@ int verifica_arquivo()
     {
         fseek(fptr, 0, 2);                  // posiciona no fim do arquivo
         cont = ftell(fptr) / sizeof(carro); // qtde de elementos
+        fclose(fptr);                       // dentro do ELSE por conta do rb
+        return cont;
+    }
+}
+
+int verifica_arquivo_cliente()
+{
+    long int cont = 0;
+    FILE *fptr = NULL;
+    if ((fptr = fopen("cliente.bin", "ab")) == NULL)
+        return cont;
+    else
+    {
+        fseek(fptr, 0, 2);                  // posiciona no fim do arquivo
+        cont = ftell(fptr) / sizeof(cliente); // qtde de elementos
         fclose(fptr);                       // dentro do ELSE por conta do rb
         return cont;
     }
@@ -133,7 +155,7 @@ void cadastra_carro(carro *p_carro, int q)
     // Número de carros cadastrados
     int n;
 
-    n = verifica_arquivo();
+    n = verifica_arquivo_carro();
     p_carro->reg_car = ++n;
     printf("\nRegistro: %i\n", p_carro->reg_car);
     printf("\nModelo: ");
@@ -159,8 +181,8 @@ void consulta_total(carro *p_carro)
 {
 	int i;
     FILE *ar = NULL;
-    int numero_de_carro = verifica_arquivo();
-    system("cls");
+
+    int numero_de_carro = verifica_arquivo_carro();
     if ((ar = fopen("carro.bin", "rb")) == NULL)
         printf("\nErro");
     else
@@ -169,7 +191,7 @@ void consulta_total(carro *p_carro)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
-            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
+            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
 
         }
     }
@@ -186,7 +208,7 @@ void consulta_se_tem_livre_por_tipo(carro *p_carro){
     scanf("%c", &op);
     fflush(stdin);
     FILE *ar = NULL;
-    int numero_de_carro = verifica_arquivo();
+    int numero_de_carro = verifica_arquivo_carro();
     if ((ar = fopen("carro.bin", "rb")) == NULL)
         printf("\nErro");
     else
@@ -204,14 +226,19 @@ void consulta_se_tem_livre_por_tipo(carro *p_carro){
 
 //Salva o cliente em um arquivo .bin
 //@param p Ponteiros de clientes utilizado
-void grava_cliente(cliente *p)
+void grava_cliente(cliente *p, char *str, int pos)
 {
-    FILE *fptr = NULL;
-    if ((fptr = fopen("cliente.bin", "ab")) == NULL)
-        printf("\nErro ao abrir o arquivo");
+    FILE *fptr=NULL;
+
+    if((fptr=fopen("cliente.bin",str))==NULL)	
+    printf("\nErro ao abrir o arquivo");
     else
-        fwrite(p, sizeof(cliente), 1, fptr);
-    fclose(fptr); // fora do ELSE por conta do ab
+    {
+        if(strcmp(str,"rb+")==0)
+            fseek(fptr,pos*sizeof(cliente),0);
+        fwrite(p,sizeof(cliente),1,fptr);
+    }//else
+    fclose(fptr);
 }
 
 //Aloca memória para o ponteiro de cliente.
@@ -223,28 +250,305 @@ void aloca_cliente(cliente **p, int q)
         exit(1);
 }
 
+void grava(carro *p,char *str,int pos)
+{
+FILE *fptr=NULL;
+if((fptr=fopen("carro.bin",str))==NULL)
+  printf("\nErro ao abrir o arquivo");
+else
+  {
+   if(strcmp(str,"rb+")==0)
+     fseek(fptr,pos*sizeof(carro),0);
+   fwrite(p,sizeof(carro),1,fptr);
+  }//else
+fclose(fptr); //fora do ELSE por conta do ab ou rb+
+}//grava
+
+int busca(carro *p_carro,int num_reg)
+{
+FILE *fptr=NULL;
+int qreg,achou=-1,i;
+qreg=verifica_arquivo_carro();
+if((fptr=fopen("carro.bin","rb"))==NULL)
+  printf("\nErro");
+else
+  {
+   for(i=0;i<qreg;i++)
+     {
+      fseek(fptr,i*sizeof(carro),0);
+      fread(p_carro,sizeof(carro),1,fptr);
+      if(p_carro->reg_car==num_reg)
+        {
+         achou=i;
+         i=qreg;  //forca a saida do for
+  }//if
+  }//for
+  fclose(fptr);   //DENTRO do else - abriu com rb   
+  }//else
+return achou;  //posicao do registro
+}//busca
+
+
+void altera(carro *p_carro, int reg_car, cliente *p_cli){
+    //Pega o valor que está no ponteiro
+    char valor_da_sigla_anterior = p_carro->status.car.sigla;
+
+    //A função busca altera o valor do ponteiro, mas o valor antigo está no p_carro
+    //É preciso guardar os valores alterados antes porque a posição é essencial para 
+    //a função gravar
+
+    int pos = reg_car-1;
+
+    //Esses prints perdidos é para debugging
+    //p_carro->status.dados[0].sigla = valor_da_sigla_anterior;
+    p_carro->status.dados[0].reg_cli = p_cli->reg_cli;
+    //if(valor_da_sigla_anterior=='R'){
+    //    strcpy(p_carro->status.dados[1].local_dev, "Sorocaba");
+    //    strcpy(p_carro->status.dados[1].local_ret, "Sorocaba");
+    //}
+    //if(valor_da_sigla_anterior=='L'){
+    //    strcpy(p_carro->status.dados[0].local_dev, "Sorocaba");
+    //    strcpy(p_carro->status.dados[0].local_ret, "Sorocaba");
+    //}
+    
+
+    //printf("\nSigla no altera: %c" ,p_carro->status.car.sigla);
+
+    //como a sigla está no valor antigo, a gente volta para o valor novo
+    printf("\nReg antes de gravar: %i\n", p_carro->reg_car);
+    p_carro->status.dados[0].sigla = valor_da_sigla_anterior;
+    grava(p_carro, "rb+",pos);
+}
+
+int busca_vago_cliente(cliente *p_cli, int qtde){
+    FILE *fptr=NULL;
+    int achou=-1,i;
+    if((fptr=fopen("cliente.bin","rb"))==NULL)
+    return achou;
+    else
+    {
+        for(i=0;i<qtde;i++)
+        {
+            fseek(fptr,i*sizeof(cliente),0);
+            fread(p_cli,sizeof(cliente),1,fptr);
+            if(p_cli->reg_cli==-1)   //achou vago
+            {
+                achou=i;  //posicao do registro vago
+                i=qtde;  //forca a saida do for
+            }//if
+        }//for
+    fclose(fptr);   //DENTRO do else - abriu com rb
+    return achou;  //posicao do registro	  
+    }//else
+}
 
 //Cadastra o cliente com o carro desejado.
 //@param op_carro Numero de registro do carro
 //@param p_cli Ponteiro de Cliente utilizado
-void cadastro_cliente(int op_carro, cliente *p_cli) { 
-	int n; 
-	p_cli->reg_cli = ++n;
-    printf("\nRegistro: %i\n", p_cli->reg_car);
+void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) { 
+	int n = verifica_arquivo_cliente(); 
+	int ind;
+    ind = busca_vago_cliente(p_cli, n);
+    if(ind!=-1){
+        n=ind;
+    }
+    p_cli->reg_cli = n+1;
+
+    //printf("ANtes");
+    if(p_carro==NULL){
+        aloca_carro(&p_carro, 1);
+    }
+    busca(p_carro, op_carro);
+
+    p_cli->reg_car = op_carro;
+    printf("\nRegistro: %i\n", p_cli->reg_cli);
     printf("\nNome: ");
     gets(p_cli->nome);
     printf("\nCPF: ");
+
+    //Boolean valido = cpf_valido
   	scanf("%s", p_cli->CPF);
     p_cli->reg_car = op_carro;
+    printf("\nModelo: %s",p_carro->modelo);
+    printf("\nSigla: %c" ,p_carro->status.car.sigla);
 
-    /* 
-       Acho que precisa setar os valores do carro.
-       Não sei como mas precisamos pegar o carro com o numero de registro,
-       alterar o union para info_cliente, colocar os valores certos e
-       finalmente salvar e sobrescrever os valores antigos.
-     */
 
-    grava_cliente(p_cli);
+    //João, aqui que tem que fazer a lógica das siglas
+    if((p_carro->status.car.sigla) == 'L')
+        p_carro->status.car.sigla = 'A';
+    else if((p_carro->status.car.sigla) == 'A')
+        p_carro->status.car.sigla = 'R';
+        else {
+            printf("\nCarro ja reservado!");
+            return;
+        }
+
+    //p_carro->status.car.sigla='A';
+    //printf("\nSigla: %c" ,p_carro->status.car.sigla);    
+    //A maracutaia está na função salvar
+    altera(p_carro, op_carro, p_cli);
+    if(ind==-1){
+        grava_cliente(p_cli,"ab", 1);
+    }else{
+        grava_cliente(p_cli,"rb+", n);
+    }
+    
+}
+
+void consulta_de_teste(carro *p_carro)
+{
+	int i;
+    FILE *ar = NULL;
+
+    if(p_carro == NULL){
+        aloca_carro(&p_carro,1);
+    }
+
+    int numero_de_carro = verifica_arquivo_carro();
+    if ((ar = fopen("carro.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        for (i = 0; i < numero_de_carro; i++)
+        {
+            fseek(ar,i*sizeof(carro),0);
+            fread(p_carro,sizeof(carro),1,ar);
+            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.dados[0].sigla);
+            printf("\nCliente: %i", p_carro->status.dados[0].reg_cli);
+        }
+    }
+}
+
+void gravaClienteAntigo(vip *p_vip, char *str,int pos)
+{
+FILE *fptr=NULL;
+if((fptr=fopen("vip.bin",str))==NULL)
+  printf("\nErro ao abrir o arquivo");
+else
+  {
+   if(strcmp(str,"rb+")==0)
+     fseek(fptr,pos*sizeof(vip),0);
+   fwrite(p_vip,sizeof(vip),1,fptr);
+  }//else
+fclose(fptr); //fora do ELSE por conta do ab ou rb+
+}//grava
+
+void aloca_vip(vip **p, int q)
+{
+    if (((*p = (vip *)realloc(*p, q * sizeof(vip))) == NULL))
+        exit(1);
+}
+
+int verifica_arquivo_vip()
+{
+    long int cont = 0;
+    FILE *fptr = NULL;
+    if ((fptr = fopen("vip.bin", "ab")) == NULL)
+        return cont;
+    else
+    {
+        fseek(fptr, 0, 2);                  // posiciona no fim do arquivo
+        cont = ftell(fptr) / sizeof(vip); // qtde de elementos
+        fclose(fptr);                       // dentro do ELSE por conta do rb
+        return cont;
+    }
+}
+
+void deletaCliente(cliente *p_cli, vip *p_vip, int pos){
+    strcpy(p_vip->nome, p_cli->nome);
+    p_vip->reg_cli = p_cli->reg_cli;
+    strcpy(p_vip->CPF, p_cli->CPF );
+    p_vip->tipo = p_cli->sigla;
+    p_cli->reg_cli=-1;
+    grava_cliente(p_cli, "rb+", pos);
+    int numeroVips = verifica_arquivo_vip();
+    gravaClienteAntigo(p_vip, "rb+", numeroVips);
+}
+
+void consulta_total_cliente(cliente *p_cliente)
+{
+	int i;
+    FILE *ar = NULL;
+
+    int numero_de_cliente = verifica_arquivo_cliente();
+    if ((ar = fopen("cliente.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        for (i = 0; i <numero_de_cliente; i++)
+        {
+            fseek(ar,i*sizeof(cliente),0);
+            fread(p_cliente,sizeof(cliente),1,ar);
+            printf("\nRegistro do cliente: %i\nNome: %s\nCPF: %s\nsigla: %c\n", p_cliente->reg_cli, p_cliente->nome, p_cliente->CPF, p_cliente->sigla, p_cliente->sigla);
+
+        }
+    }
+}
+
+int busca_cpf(cliente *p_cli,char *cpf_devolucao)
+{
+FILE *fptr=NULL;
+int qreg,achou=-1,i;
+int sobra;
+qreg=verifica_arquivo_cliente();
+if((fptr=fopen("cliente.bin","rb"))==NULL)
+  printf("\nErro");
+else
+  {
+   for(i=0;i<qreg;i++)
+     {
+      fseek(fptr,i*sizeof(cliente),0);
+      fread(p_cli,sizeof(cliente),1,fptr);
+      sobra = strcmp(p_cli->CPF, cpf_devolucao);
+      if(sobra==0)
+        {
+         achou=i;
+         i=qreg;  //forca a saida do for
+         printf("\nCPF = %s foi encontrado no sistema!\n", p_cli->CPF);
+  	}//if
+  }//for
+  fclose(fptr);   //DENTRO do else - abriu com rb   
+  }//else
+return achou;  //posicao do registro
+}//busca
+
+
+int buscaCarroPorRegCli(carro *p_carro, int reg_cli){
+    int pos =-1;
+    FILE *fptr=NULL;
+int qreg,achou=-1,i;
+int sobra;
+qreg=verifica_arquivo_carro();
+if((fptr=fopen("carro.bin","rb"))==NULL)
+  printf("\nErro");
+else
+  {
+   for(i=0;i<qreg;i++)
+     {
+      fseek(fptr,i*sizeof(carro),0);
+      fread(p_carro,sizeof(carro),1,fptr);
+      if(p_carro->status.dados[0].reg_cli==reg_cli)
+        {
+         achou=i;
+         i=qreg;  //forca a saida do for
+         printf("\nCarro foi encontrado no sistema!\n");
+  	}//if
+  }//for
+  fclose(fptr);   //DENTRO do else - abriu com rb   
+  }//else
+    return pos;
+}
+
+int devolucao(carro *p_carro, cliente *p_cli) {
+	char cpf_devolucao[20];
+	
+	printf("Informe seu CPF: ");
+	scanf("%s", &cpf_devolucao);
+	int lugarDoCliente = busca_cpf(p_cli, cpf_devolucao);
+    p_carro->status.car.sigla = 'L';
+    buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
+    altera(p_carro, p_cli->reg_car, p_cli);
+    return lugarDoCliente;
 }
 
 int main()
@@ -252,6 +556,11 @@ int main()
     setlocale(LC_ALL, "");
     carro *p_carro = NULL;
     cliente *p_cli = NULL;
+    vip *p_vip = NULL;
+    
+    aloca_carro(&p_carro, 1);
+    aloca_cliente(&p_cli,1);
+    aloca_vip(&p_vip, 1);
 
     int op, op_carro;
     info_carro a;
@@ -266,19 +575,29 @@ int main()
         case 1:
             strcpy(a.local_ret, "\nCadastro");
             printf("%s\n", a.local_ret);
-            aloca_carro(&p_carro, 1);
             cadastra_carro(p_carro, 1);
             break;
         case 2:
             consulta_total(p_carro);
-            printf("Digite o registro do carro que deseja alugar: ");
+            printf("\nDigite o registro do carro que deseja alugar: ");
             scanf("%i", &op_carro);
-			system("cls");
-			cadastro_cliente(op_carro, p_cli);
+            fflush(stdin);
+            //printf("Antes de cadastro cliente");
+			cadastro_cliente(op_carro, p_cli,p_carro);
             break;
         case 3:
             consulta_se_tem_livre_por_tipo(p_carro);
             system("pause");
+            break;
+        case 9:
+            consulta_de_teste(p_carro);
+            break;
+        case 10:
+            consulta_total_cliente(p_cli);
+            break;
+        case 11:
+            int pos = devolucao(p_carro, p_cli);
+            deletaCliente(p_cli, p_vip, pos);
             break;
         } // switch
 
