@@ -116,6 +116,7 @@ int busca_cpf(cliente *p_cli,char *cpf_devolucao);
 int buscaCarroPorRegCli(carro *p_carro, int reg_cli);
 int devolucao(carro *p_carro, cliente *p_cli);
 void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos);
+void consulta_historico_cliente(vip *p_vip);
 
 int main()
 {
@@ -164,6 +165,9 @@ int main()
         case 11:
             int pos = devolucao(p_carro, p_cli);
             deletaCliente(p_cli, p_vip, pos);
+            break;
+        case 12:
+            consulta_historico_cliente(p_vip);
             break;
         } // switch
 
@@ -694,4 +698,26 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
     fflush(stdin);
 
     p_carro->status.dados[pos].mes_dev = mes_dev;
+}
+
+//Verifica todos os carros cadastrados.
+//Faz um print de todos os carros cadastrados no sistema
+//@param p_carro Ponteiro de carros utilizado
+void consulta_historico_cliente(vip *p_vip)
+{
+	int i;
+    FILE *ar = NULL;
+
+    int num_de_vip = verifica_arquivo_vip();
+    if ((ar = fopen("vip.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        for (i = 0; i < num_de_vip; i++)
+        {
+            fseek(ar,i*sizeof(vip),0);
+            fread(p_vip,sizeof(vip),1,ar);
+            printf("\n %i %s %s %c\n", p_vip->reg_cli, p_vip->nome, p_vip->CPF, p_vip->tipo);
+        }
+    }
 }
