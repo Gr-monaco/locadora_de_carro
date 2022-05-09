@@ -164,7 +164,7 @@ int main()
             break;
         case 11:
             int pos = devolucao(p_carro, p_cli);
-            deletaCliente(p_cli, p_vip, pos);
+            if(pos!=-1) deletaCliente(p_cli, p_vip, pos);
             break;
         case 12:
             consulta_historico_cliente(p_vip);
@@ -632,6 +632,10 @@ int devolucao(carro *p_carro, cliente *p_cli) {
 	printf("Informe seu CPF: ");
 	scanf("%s", &cpf_devolucao);
 	int lugarDoCliente = busca_cpf(p_cli, cpf_devolucao);
+    if(lugarDoCliente==-1){
+        printf("\nCliente não encontrado.");
+        return -1;
+    }
     buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
     printf("\nSigla do carro antes do if: %c", p_carro->status.car.sigla);
 
