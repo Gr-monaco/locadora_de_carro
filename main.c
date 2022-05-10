@@ -117,6 +117,7 @@ int buscaCarroPorRegCli(carro *p_carro, int reg_cli);
 int devolucao(carro *p_carro, cliente *p_cli);
 void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos);
 void consulta_historico_cliente(vip *p_vip);
+float calculaValorAPagar(carro *p_carro);
 
 int main()
 {
@@ -636,13 +637,18 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         printf("\nCliente não encontrado.");
         return -1;
     }
-    buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
-    printf("\nSigla do carro antes do if: %c", p_carro->status.car.sigla);
+    int localDoCarro = buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
+    if (localDoCarro==-1){
+        printf("\nCarro com registro não encontrado");
+        return -1;
+    }
+    if(p_carro->status.dados[0].reg_cli != p_cli->reg_cli){
+        printf("\nRegistro de cliente do aluguel não bate com registro do cliente");
+        return -1;
+    }
 
     if(p_carro->status.car.sigla == 'R'){
-        printf("\nSigla do carro antes: %c", p_carro->status.car.sigla);
         p_carro->status.car.sigla = 'A';
-        printf("\nSigla do carro depois: %c", p_carro->status.car.sigla);
 
         p_carro->status.dados[0].dia_dev = p_carro->status.dados[1].dia_dev;
         p_carro->status.dados[0].mes_dev = p_carro->status.dados[1].mes_dev;
@@ -651,24 +657,20 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         p_carro->status.dados[0].dia_ret = p_carro->status.dados[1].dia_ret;
         p_carro->status.dados[0].mes_ret = p_carro->status.dados[1].mes_ret;
         p_carro->status.dados[0].reg_cli = p_carro->status.dados[1].reg_cli;
-        printf("\nSigla do carro antes do dados: %c", p_carro->status.car.sigla);
 
         //A sigla está dando erro, parece que a sigla de dados[1] não recebe os valores
         //p_carro->status.dados[0].sigla = p_carro->status.dados[1].sigla;
 
-        printf("\nSigla do carro depois do dados: %c", p_carro->status.car.sigla);
 
     }
     else
     {
-        printf("Ta indo no L");
-        printf("\nSigla do carro antes: %c", p_carro->status.car.sigla);
-
         p_carro->status.car.sigla = 'L';
-        printf("\nSigla do carro depois: %c", p_carro->status.car.sigla);
-
     }
     altera(p_carro, p_cli->reg_car, p_cli);
+
+    float valor = calculaValorAPagar(p_carro);
+
     return lugarDoCliente;
 }
 
@@ -724,4 +726,31 @@ void consulta_historico_cliente(vip *p_vip)
             printf("\n %i %s %s %c\n", p_vip->reg_cli, p_vip->nome, p_vip->CPF, p_vip->tipo);
         }
     }
+}
+
+float calculaValorAPagar(carro *p_carro){
+    float valor;
+    int dia_retorno, mes_retorno, dias_utilizados;
+
+    fflush(stdin);
+    printf("\nQual o dia do retorno: ");
+    scanf("%i", &dia_retorno);
+    printf("\nQUal o mês de retorno: ");
+    scanf("%i", &mes_retorno);
+
+    //A diaria vai ser mais barata nos meses de 31 dias
+    if(p_carro->status.dados[0].mes_ret > mes_retorno){ // isso leva em consideração devolução no ano seguinte
+        int total_dias_ate_ano_novo = (p_carro->status.dados[0].mes_ret)*30 - p_carro->status.dados[0].dia_ret;
+        int dias_ate_dev_ano_atual = (mes_retorno-1)*30 + dia_retorno; 
+        
+        dias_utilizados = total_dias_ate_ano_novo + dias_ate_dev_ano_atual;
+    } 
+
+     float diaria_a_cobrar = p_carro->diaria;
+        //Verifica se tem multa
+        if(mes_retorno > p_carro->status.dados[0].mes_dev && dia_retorno > p_carro->status.dados[0].dia_dev){
+            diaria_a_cobrar *= 2;
+        }
+
+    return valor;
 }
