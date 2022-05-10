@@ -118,6 +118,8 @@ int devolucao(carro *p_carro, cliente *p_cli);
 void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos);
 void consulta_historico_cliente(vip *p_vip);
 float calculaValorAPagar(carro *p_carro);
+int calculaDiasEntreDatas(int dia, int mes, carro *p_carro);
+char* escolheCidade();
 
 int main()
 {
@@ -245,7 +247,7 @@ void cadastra_carro(carro *p_carro, int q)
     fflush(stdin);
 
     p_carro->status.car.sigla = 'L';
-    strcpy(p_carro->status.car.local_ret, "Sorocaba");
+    strcpy(p_carro->status.car.local_ret, escolheCidade());
 
     grava_carro(p_carro,"ab", 1);
 }
@@ -269,7 +271,7 @@ void consulta_total(carro *p_carro)
             fread(p_carro,sizeof(carro),1,ar);
             if(p_carro->status.car.sigla == 'L')
             {
-                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
+                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nLocal de Retirada: %s\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria,p_carro->status.car.local_ret, p_carro->status.car.sigla);
             }else{
                 printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
                 printf("Dia devolucao: %i / %i\n", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
@@ -624,7 +626,7 @@ else
   }//for
   fclose(fptr);   //DENTRO do else - abriu com rb   
   }//else
-    return pos;
+    return achou;
 }
 
 int devolucao(carro *p_carro, cliente *p_cli) {
@@ -638,8 +640,9 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         return -1;
     }
     int localDoCarro = buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
+    printf("\n Local: %i", localDoCarro);
     if (localDoCarro==-1){
-        printf("\nCarro com registro não encontrado");
+        printf("\nCarro com blebelbe não encontrado");
         return -1;
     }
     if(p_carro->status.dados[0].reg_cli != p_cli->reg_cli){
@@ -728,9 +731,30 @@ void consulta_historico_cliente(vip *p_vip)
     }
 }
 
+int calculaDiasEntreDatas(int dia, int mes, carro *p_carro){
+    int dias_utilizados;
+
+//A diaria vai ser mais barata nos meses de 31 dias
+    if(p_carro->status.dados[0].mes_ret > mes){ // isso leva em consideração devolução no ano seguinte
+        int total_dias_ate_ano_novo = 360 -((p_carro->status.dados[0].mes_ret) -1 )*30 - p_carro->status.dados[0].dia_ret;
+        int dias_ate_dev_ano_atual = (mes-1)*30 + dia; 
+        
+        dias_utilizados = total_dias_ate_ano_novo + dias_ate_dev_ano_atual;
+        
+    } else {
+        int dias_mes = (mes-(p_carro->status.dados[0].mes_ret)) * 30;
+        int entreDias = dia - p_carro->status.dados[0].dia_ret;
+
+        dias_utilizados = dias_mes +entreDias;
+    }
+
+    return dias_utilizados;
+}
+
 float calculaValorAPagar(carro *p_carro){
     float valor;
-    int dia_retorno, mes_retorno, dias_utilizados;
+    int dia_retorno, mes_retorno;
+    int temMulta = 0;
 
     fflush(stdin);
     printf("\nQual o dia do retorno: ");
@@ -738,19 +762,45 @@ float calculaValorAPagar(carro *p_carro){
     printf("\nQUal o mês de retorno: ");
     scanf("%i", &mes_retorno);
 
-    //A diaria vai ser mais barata nos meses de 31 dias
-    if(p_carro->status.dados[0].mes_ret > mes_retorno){ // isso leva em consideração devolução no ano seguinte
-        int total_dias_ate_ano_novo = (p_carro->status.dados[0].mes_ret)*30 - p_carro->status.dados[0].dia_ret;
-        int dias_ate_dev_ano_atual = (mes_retorno-1)*30 + dia_retorno; 
-        
-        dias_utilizados = total_dias_ate_ano_novo + dias_ate_dev_ano_atual;
-    } 
+    float multa = 0;
+    int dias_ate_dev = calculaDiasEntreDatas(dia_retorno, mes_retorno, p_carro);
+    int dias_ate_multa = calculaDiasEntreDatas(p_carro->status.dados[0].dia_dev,p_carro->status.dados[0].mes_dev, p_carro);
+    int dias_utilizados;
+    if(dias_ate_multa < dias_ate_dev){
+        printf("\nMULTA APLICADA");
+        multa = (p_carro->diaria)*2 * (dias_ate_dev - dias_ate_multa);
+        printf("\n %.2f", multa);
+        dias_utilizados = dias_ate_multa;
+        printf("\nDias ate multa: %i", dias_utilizados);
+    }
+    else{
+        dias_utilizados = dias_ate_dev;
+    }
+    float diaria_a_cobrar = p_carro->diaria;
 
-     float diaria_a_cobrar = p_carro->diaria;
-        //Verifica se tem multa
-        if(mes_retorno > p_carro->status.dados[0].mes_dev && dia_retorno > p_carro->status.dados[0].dia_dev){
-            diaria_a_cobrar *= 2;
-        }
-
+    valor = (diaria_a_cobrar * dias_utilizados + multa);
+    printf("\nValor a pagar:  %.2f ", valor);
     return valor;
+}
+
+char* escolheCidade(){
+    int op_correta = -1;
+    int op = 0;
+    do{
+        printf("Escolha uma cidade para retirada\n[1] - Sorocaba [2] - Itu\n");
+        scanf("%i", &op);
+        switch (op)
+        {
+        case 1:
+            return "Sorocaba";
+            op_correta=1;
+            break;
+        case 2:
+            return "Itu";
+            op_correta=1;
+        default:
+            printf("\nPor favor, escolha uma opcao valida:");
+            break;
+        }
+    } while (op_correta==-1);
 }
