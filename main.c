@@ -120,6 +120,7 @@ void consulta_historico_cliente(vip *p_vip);
 float calculaValorAPagar(carro *p_carro);
 int calculaDiasEntreDatas(int dia, int mes, carro *p_carro);
 char* escolheCidade();
+void consulta_nova(carro *p_carro);
 
 int main()
 {
@@ -137,7 +138,7 @@ int main()
     int numero;
     do
     {
-        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Fim\nOpcao:");
+        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Devolução\n[5]Consulta Cliente Antigo\n[6]Fim\nOpcao:");
         scanf("%i", &op);
         fflush(stdin);
         switch (op)
@@ -159,6 +160,13 @@ int main()
             consulta_se_tem_livre_por_tipo(p_carro);
             system("pause");
             break;
+        case 4:
+            int pos = devolucao(p_carro, p_cli);
+            if(pos!=-1) deletaCliente(p_cli, p_vip, pos);
+            break;
+        case 5:
+            consulta_historico_cliente(p_vip);
+            break;
         case 9:
             consulta_de_teste(p_carro);
             break;
@@ -166,15 +174,14 @@ int main()
             consulta_total_cliente(p_cli);
             break;
         case 11:
-            int pos = devolucao(p_carro, p_cli);
-            if(pos!=-1) deletaCliente(p_cli, p_vip, pos);
+            consulta_nova(p_carro);
             break;
-        case 12:
-            consulta_historico_cliente(p_vip);
+        default:
+            printf("\nEscolha uma opcao valida\n");
             break;
         } // switch
 
-    } while (op != 4);
+    } while (op != 6);
     system("pause");
     return 1;
 }
@@ -247,10 +254,100 @@ void cadastra_carro(carro *p_carro, int q)
     fflush(stdin);
 
     p_carro->status.car.sigla = 'L';
+    printf("\nEscolha uma cidade para retirar o carro: ");
     strcpy(p_carro->status.car.local_ret, escolheCidade());
 
     grava_carro(p_carro,"ab", 1);
 }
+
+char escolhe_tipo(){
+    char escolha = 'a'; //escolha arbitraria
+    printf("\nEscolha um tipo");
+    while (escolha != 'G' || escolha != 'M' || escolha != 'P')
+    {
+        printf("\nEscolha um tipo: \n[G] - Grande \n[M] - Medio \n[P] - Pequeno\n");
+        fflush(stdin);
+        scanf("%c", &escolha);
+        if(escolha != 'G' || escolha != 'M' || escolha != 'P'){
+            printf("\nEscolha uma opção valida\n");
+        }
+    }
+
+    return escolha;
+}
+
+int escolhe_entre_numeros(int numero_a, int numero_b){
+    int escolha=numero_a-1; // Garante que a escolha seja inicializada e esteja entre o intervalo a e b
+    printf("\nEscolha um numero entre %i e %i\n: ", numero_a, numero_b);
+    while(escolha < numero_a || escolha > numero_b){
+        fflush(stdin);
+        scanf("%i", &escolha);
+        if(escolha < numero_a || escolha > numero_b){
+            printf("\nEscolha um numero valido.\n");
+        }
+    }
+}
+
+int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca){
+    int boleano = 0;
+
+    if(p_carro->status.car.sigla=='L'){
+        boleano = 1;
+        return boleano;
+    }
+
+    if(p_carro->status.car.sigla=='A'){
+        if(p_carro->status.dados[0].dia_dev < dia_busca && p_carro->status.dados[0].mes_dev <= mes_busca ){
+            boleano = 1;
+            return boleano;
+        }
+    }
+
+    if(p_carro->status.car.sigla=='R'){
+        if(p_carro->status.dados[1].dia_dev < dia_busca && p_carro->status.dados[1].mes_dev <= mes_busca ){
+            boleano = 1;
+            return boleano;
+        }
+    }
+    
+    return boleano;
+}
+
+void consulta_nova(carro *p_carro){
+    int dia_entrega = -1;
+    int mes_entrega = -1;
+    char tipo_busca = ' ';
+    char op;
+    char local_busca[30] = "Sem escolha";
+    printf("\nEscolha um dia: ");
+    dia_entrega = escolhe_entre_numeros(1,30);
+    printf("\nEscolha um mes: ");
+    mes_entrega = escolhe_entre_numeros(1,12);
+    tipo_busca = escolhe_tipo();
+    strcpy(local_busca, escolheCidade());
+
+    int i, verifica_dia_livre;
+    fflush(stdin);
+    FILE *ar = NULL;
+    int numero_de_carro = verifica_arquivo_carro();
+    if ((ar = fopen("carro.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        for (i = 0; i < numero_de_carro; i++)
+        {
+            fseek(ar,i*sizeof(carro),0);
+            fread(p_carro,sizeof(carro),1,ar);
+            verifica_dia_livre = verifica_se_esta_livre(p_carro, dia_entrega, mes_entrega);
+            if(p_carro->tipo==op && strcmp(p_carro->status.car.local_ret, local_busca)
+                && verifica_dia_livre==1){
+                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
+            }
+        }
+    }
+
+}
+
 
 //Verifica todos os carros cadastrados.
 //Faz um print de todos os carros cadastrados no sistema
@@ -707,6 +804,8 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
     fflush(stdin);
 
     p_carro->status.dados[pos].mes_dev = mes_dev;
+    printf("\nEscolha uma cidade para devolver o carro: ");
+    strcpy(p_carro->status.dados[pos].local_dev , escolheCidade());
 }
 
 //Verifica todos os carros cadastrados.
@@ -787,7 +886,7 @@ char* escolheCidade(){
     int op_correta = -1;
     int op = 0;
     do{
-        printf("Escolha uma cidade para retirada\n[1] - Sorocaba [2] - Itu\n");
+        printf("Escolha uma cidade \n[1] - Sorocaba [2] - Itu\n");
         scanf("%i", &op);
         switch (op)
         {
