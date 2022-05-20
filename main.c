@@ -121,6 +121,9 @@ float calculaValorAPagar(carro *p_carro);
 int calculaDiasEntreDatas(int dia, int mes, carro *p_carro);
 char* escolheCidade();
 void consulta_nova(carro *p_carro);
+char escolhe_tipo();
+int escolhe_entre_numeros(int numero_a, int numero_b);
+int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca);
 
 int main()
 {
