@@ -298,7 +298,12 @@ int escolhe_entre_numeros(int numero_a, int numero_b){
     }
 }
 
+
 int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca){
+    //Só leva em consideração no mesmo ano, a implementação para garantir diferença de ano fica
+    //extremamente impossivel sem o dado de ano
+    //Infelizmente não podemos alterar a struct para incluir ano
+
     int boleano = 0;
 
     if(p_carro->status.car.sigla=='L'){
