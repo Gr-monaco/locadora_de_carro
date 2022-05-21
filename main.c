@@ -126,6 +126,7 @@ char escolhe_tipo();
 int escolhe_entre_numeros(int numero_a, int numero_b);
 int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca);
 int tem_no_lugar_certo(carro *p_carro, char *local);
+void apresenta_dados_carro(carro *p_carro);
 
 int main()
 {
@@ -306,14 +307,14 @@ int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca){
     }
 
     if(p_carro->status.car.sigla=='A'){
-        if(p_carro->status.dados[0].dia_dev < dia_busca && p_carro->status.dados[0].mes_dev <= mes_busca ){
+        if((p_carro->status.dados[0].dia_dev < dia_busca && p_carro->status.dados[0].mes_dev == mes_busca) || p_carro->status.dados[0].mes_dev < mes_busca ){
             boleano = 1;
             return boleano;
         }
     }
 
     if(p_carro->status.car.sigla=='R'){
-        if(p_carro->status.dados[1].dia_dev < dia_busca && p_carro->status.dados[1].mes_dev <= mes_busca ){
+        if((p_carro->status.dados[1].dia_dev < dia_busca && p_carro->status.dados[1].mes_dev == mes_busca) || p_carro->status.dados[1].mes_dev < mes_busca ){
             boleano = 1;
             return boleano;
         }
@@ -374,15 +375,35 @@ void consulta_nova(carro *p_carro){
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
             verifica_dia_livre = verifica_se_esta_livre(p_carro, dia_entrega, mes_entrega);
+            printf("\n %i %c %i %i", p_carro->reg_car, p_carro->tipo, tem_no_lugar_certo(p_carro, local_busca), verifica_dia_livre);
             if(p_carro->tipo==tipo_busca && tem_no_lugar_certo(p_carro, local_busca)==1
                 && verifica_dia_livre==1){
-                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
+                apresenta_dados_carro(p_carro);
             }
         }
     }
 
 }
 
+
+void apresenta_dados_carro(carro *p_carro){
+    if (p_carro->status.car.sigla == 'L')
+    {
+        printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %.2f\nLocal de Retirada: %s\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.local_ret, p_carro->status.car.sigla);
+    }
+    else if (p_carro->status.car.sigla == 'A')
+    {
+        printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %.2f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
+        printf("Local de devolucao: %s\n", p_carro->status.dados[0].local_dev);
+        printf("Dia devolucao: %i / %i\n", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
+    }
+    else
+    {
+        printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %.2f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
+        printf("Local de devolucao: %s\n", p_carro->status.dados[1].local_dev);
+        printf("Dia devolucao: %i / %i\n", p_carro->status.dados[1].dia_dev, p_carro->status.dados[1].mes_dev);
+    }
+}
 
 //Verifica todos os carros cadastrados.
 //Faz um print de todos os carros cadastrados no sistema
@@ -401,13 +422,7 @@ void consulta_total(carro *p_carro)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
-            if(p_carro->status.car.sigla == 'L')
-            {
-                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nLocal de Retirada: %s\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria,p_carro->status.car.local_ret, p_carro->status.car.sigla);
-            }else{
-                printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
-                printf("Dia devolucao: %i / %i\n", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
-            }
+            apresenta_dados_carro(p_carro);
 
         }
     }
