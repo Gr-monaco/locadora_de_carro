@@ -321,6 +321,33 @@ int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca){
     return boleano;
 }
 
+int tem_no_lugar_certo(carro *p_carro, char *local){
+    int retorno = 0;
+    
+    if(p_carro->status.car.sigla == 'L'){
+        if(strcmp(p_carro->status.car.local_ret, local)==0){
+            retorno = 1;
+            return retorno;
+        }
+    }
+
+    if(p_carro->status.car.sigla == 'A'){
+        if(strcmp(p_carro->status.dados[0].local_dev, local)==0){
+            retorno = 1;
+            return retorno;
+        }
+    }
+
+    if(p_carro->status.car.sigla == 'R'){
+        if(strcmp(p_carro->status.dados[1].local_dev, local)==0){
+            retorno = 1;
+            return retorno;
+        }
+    }
+
+    return retorno;
+}
+
 void consulta_nova(carro *p_carro){
     int dia_entrega = -1;
     int mes_entrega = -1;
@@ -345,11 +372,8 @@ void consulta_nova(carro *p_carro){
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
-            printf("\nRegistro do Carro: %i", p_carro->reg_car);
-            printf("\nLocal: %i", strcmp(p_carro->status.car.local_ret, local_busca));
-
             verifica_dia_livre = verifica_se_esta_livre(p_carro, dia_entrega, mes_entrega);
-            if(p_carro->tipo==tipo_busca && strcmp(p_carro->status.car.local_ret, local_busca)==0
+            if(p_carro->tipo==tipo_busca && tem_no_lugar_certo(p_carro, local_busca)==1
                 && verifica_dia_livre==1){
                 printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
             }
