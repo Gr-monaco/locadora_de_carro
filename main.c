@@ -782,17 +782,6 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         return -1;
     }
 
-    printf("\nDia_ret[0] %i",p_carro->status.dados[0].dia_ret);
-    printf("\nMes_ret[0] %i",p_carro->status.dados[0].mes_ret);
-    printf("\nDia_dev[0] %i",p_carro->status.dados[0].dia_dev);
-    printf("\nMes_dev[0] %i",p_carro->status.dados[0].mes_dev);
-    
-    printf("\nDia_ret[1] %i",p_carro->status.dados[1].dia_ret);
-    printf("\nMes_ret[1] %i",p_carro->status.dados[1].mes_ret);
-    printf("\nDia_dev[1] %i",p_carro->status.dados[1].dia_dev);
-    printf("\nMes_dev[1] %i",p_carro->status.dados[1].mes_dev);
-
-
     float valor = calculaValorAPagar(p_carro);
 
     if(p_carro->status.car.sigla == 'R'){
@@ -924,7 +913,6 @@ float calculaValorAPagar(carro *p_carro){
 
     float multa = 0;
     int dias_ate_dev = calculaDiasEntreDatas(dia_retorno, mes_retorno, p_carro);
-    printf("\nDia de dev: %i\nMes de dev: %i", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
     int dias_ate_multa = calculaDiasEntreDatas(p_carro->status.dados[0].dia_dev,p_carro->status.dados[0].mes_dev, p_carro);
     int dias_utilizados;
     if(dias_ate_multa < dias_ate_dev){
