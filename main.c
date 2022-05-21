@@ -473,7 +473,7 @@ void grava_cliente(cliente *p, char *str, int pos)
         if(strcmp(str,"rb+")==0)
             fseek(fptr,pos*sizeof(cliente),0);
             printf("\nreg car do p_cli : %i",p->reg_car);
-
+            printf("\nnome_cli = %s", p->nome);
         fwrite(p,sizeof(cliente),1,fptr);
     }//else
     fclose(fptr);
@@ -582,12 +582,28 @@ int busca_vago_cliente(cliente *p_cli, int qtde){
 //@param op_carro Numero de registro do carro
 //@param p_cli Ponteiro de Cliente utilizado
 void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) { 
-	int n = verifica_arquivo_cliente(); 
+	
+    printf("\nCPF: ");
+    gets(p_cli->CPF);
+    char *cpf_a_comparar;
+    strcpy(cpf_a_comparar, p_cli->CPF);
+    int ve_se_cliente_existe = busca_cpf(p_cli, cpf_a_comparar);
+    if(ve_se_cliente_existe!=-1){
+        printf("\nCliente esta alugando carro");
+        return;
+    }
+    strcpy(p_cli->CPF,cpf_a_comparar);
+    
+    int n = verifica_arquivo_cliente(); 
 	int ind;
     ind = busca_vago_cliente(p_cli, n);
+    printf("\nn = %i", n);
+    printf("\nInd = %i", ind);
     if(ind!=-1){
         n=ind;
     }
+    printf("\nn = %i", n);
+    printf("\nInd = %i", ind);
     p_cli->reg_cli = n+1;
 
     //printf("ANtes");
@@ -601,18 +617,8 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     printf("\nRegistro: %i\n", p_cli->reg_cli);
     printf("\nNome: ");
     gets(p_cli->nome);
-    printf("\nCPF: ");
-
     //Boolean valido = cpf_valido
-  	gets(p_cli->CPF);
-    printf("\nCPF antes da busca: %s", p_cli->CPF);
-    char *cpf_a_comparar;
-    strcpy(cpf_a_comparar, p_cli->CPF);
-    int ve_se_cliente_existe = busca_cpf(p_cli, cpf_a_comparar);
-    if(ve_se_cliente_existe!=-1){
-        printf("\nCliente esta alugando carro");
-        return;
-    }
+  	
     p_cli->reg_car = op_carro;
     printf("\nModelo: %s",p_carro->modelo);
     printf("\nSigla: %c" ,p_carro->status.car.sigla);
@@ -640,8 +646,11 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     altera(p_carro, op_carro, p_cli);
     printf("\nreg car do p_cli : %i",p_cli->reg_car);
     if(ind==-1){
+        printf("\nDentro do ind");
         grava_cliente(p_cli,"ab", 1);
     }else{
+        printf("\nFora do ind");
+
         grava_cliente(p_cli,"rb+", n);
     }
     
@@ -739,8 +748,6 @@ void consulta_total_cliente(cliente *p_cliente)
 
 int busca_cpf(cliente *p_cli,char *cpf_devolucao)
 {
-printf("\nCPF dps da busca: %s", p_cli->CPF);
-printf("\nCPF dev dps da busca: %s", cpf_devolucao);
 FILE *fptr=NULL;
 int qreg,achou=-1,i;
 int sobra;
@@ -751,15 +758,9 @@ else
   {
    for(i=0;i<qreg;i++)
      {
-      printf("\nCPF antes strcmp: %s", cpf_devolucao);
       fseek(fptr,i*sizeof(cliente),0);
       fread(p_cli,sizeof(cliente),1,fptr);
-      printf("\nCPF antes strcmp: %s", cpf_devolucao);
-
       sobra = strcmp(p_cli->CPF, cpf_devolucao);
-      printf("\nCPF dev dps da strcmp: %s", cpf_devolucao);
-
-      printf("\nCpf %s is %s?", p_cli->CPF, cpf_devolucao);
       if(sobra==0)
         {
          achou=i;
@@ -914,7 +915,7 @@ void consulta_historico_cliente(vip *p_vip)
         {
             fseek(ar,i*sizeof(vip),0);
             fread(p_vip,sizeof(vip),1,ar);
-            printf("\n %i %s %s %c\n", p_vip->reg_cli, p_vip->nome, p_vip->CPF, p_vip->tipo);
+            printf("\n %s %i %s %s %c\n",p_vip->nome, p_vip->reg_cli, p_vip->nome, p_vip->CPF, p_vip->tipo);
         }
     }
 }
