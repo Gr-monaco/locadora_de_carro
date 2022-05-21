@@ -603,6 +603,11 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
 
     //Boolean valido = cpf_valido
   	scanf("%s", p_cli->CPF);
+    int ve_se_cliente_existe = busca_cpf(p_cli, p_cli->CPF);
+    if(ve_se_cliente_existe!=-1){
+        printf("\nCliente esta alugando carro");
+        return;
+    }
     p_cli->reg_car = op_carro;
     printf("\nModelo: %s",p_carro->modelo);
     printf("\nSigla: %c" ,p_carro->status.car.sigla);
@@ -720,7 +725,7 @@ void consulta_total_cliente(cliente *p_cliente)
         {
             fseek(ar,i*sizeof(cliente),0);
             fread(p_cliente,sizeof(cliente),1,ar);
-            printf("\nRegistro do cliente: %i\nNome: %s\nCPF: %s\nsigla: %c\n", p_cliente->reg_cli, p_cliente->nome, p_cliente->CPF, p_cliente->sigla, p_cliente->sigla);
+            printf("\nRegistro do cliente: %i\nNome: %s\nCPF: %s\nSigla: %c\nN do registro do carro: %i\n", p_cliente->reg_cli, p_cliente->nome, p_cliente->CPF, p_cliente->sigla, p_cliente->sigla, p_cliente->reg_car);
 
         }
     }
