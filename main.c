@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
+#include <ctype.h>
 
 /* 
     Verificar se CPF é permitido - baixa prioridade
@@ -249,8 +250,7 @@ void cadastra_carro(carro *p_carro, int q)
     printf("\nModelo: ");
     gets(p_carro->modelo);
     fflush(stdin);
-    printf("\nTipo: ");
-    scanf("%c", &(p_carro->tipo));
+    p_carro->tipo = escolhe_tipo();
     fflush(stdin);
     printf("\nDiaria: ");
     scanf("%f", &(p_carro->diaria));
@@ -265,14 +265,19 @@ void cadastra_carro(carro *p_carro, int q)
 
 char escolhe_tipo(){
     char escolha = 'a'; //escolha arbitraria
-    printf("\nEscolha um tipo");
-    while (escolha != 'G' || escolha != 'M' || escolha != 'P')
+    char escolha_intermediaria = 'a';
+    while (escolha != 'G' && escolha != 'M' && escolha != 'P')
     {
+
         printf("\nEscolha um tipo: \n[G] - Grande \n[M] - Medio \n[P] - Pequeno\n");
         fflush(stdin);
-        scanf("%c", &escolha);
-        if(escolha != 'G' || escolha != 'M' || escolha != 'P'){
-            printf("\nEscolha uma opção valida\n");
+        scanf("%c", &escolha_intermediaria);
+        escolha = toupper(escolha_intermediaria);
+
+
+
+        if(escolha != 'G' && escolha != 'M' && escolha != 'P'){
+            printf("\nEscolha uma opcao valida\n");
         }
     }
 
@@ -320,7 +325,6 @@ void consulta_nova(carro *p_carro){
     int dia_entrega = -1;
     int mes_entrega = -1;
     char tipo_busca = ' ';
-    char op;
     char local_busca[30] = "Sem escolha";
     printf("\nEscolha um dia: ");
     dia_entrega = escolhe_entre_numeros(1,30);
@@ -341,8 +345,11 @@ void consulta_nova(carro *p_carro){
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
+            printf("\nRegistro do Carro: %i", p_carro->reg_car);
+            printf("\nLocal: %i", strcmp(p_carro->status.car.local_ret, local_busca));
+
             verifica_dia_livre = verifica_se_esta_livre(p_carro, dia_entrega, mes_entrega);
-            if(p_carro->tipo==op && strcmp(p_carro->status.car.local_ret, local_busca)
+            if(p_carro->tipo==tipo_busca && strcmp(p_carro->status.car.local_ret, local_busca)==0
                 && verifica_dia_livre==1){
                 printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria);
             }
@@ -485,7 +492,6 @@ void altera(carro *p_carro, int reg_car, cliente *p_cli){
 
     //Esses prints perdidos é para debugging
     //p_carro->status.dados[0].sigla = valor_da_sigla_anterior;
-    p_carro->status.dados[0].reg_cli = p_cli->reg_cli;
     //if(valor_da_sigla_anterior=='R'){
     //    strcpy(p_carro->status.dados[1].local_dev, "Sorocaba");
     //    strcpy(p_carro->status.dados[1].local_ret, "Sorocaba");
@@ -717,6 +723,7 @@ else
      {
       fseek(fptr,i*sizeof(carro),0);
       fread(p_carro,sizeof(carro),1,fptr);
+      printf("\n reg cli no carro[0] -> %i",p_carro->status.dados[0].reg_cli);
       if(p_carro->status.dados[0].reg_cli==reg_cli)
         {
          achou=i;
@@ -740,9 +747,9 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         return -1;
     }
     int localDoCarro = buscaCarroPorRegCli(p_carro, p_cli->reg_cli);//altera a posição do carro para bater com o do cliente
-    printf("\n Local: %i", localDoCarro);
+
     if (localDoCarro==-1){
-        printf("\nCarro com blebelbe não encontrado");
+        printf("\nCarro com registro não encontrado");
         return -1;
     }
     if(p_carro->status.dados[0].reg_cli != p_cli->reg_cli){
@@ -769,6 +776,8 @@ int devolucao(carro *p_carro, cliente *p_cli) {
     else
     {
         p_carro->status.car.sigla = 'L';
+        strcpy(p_carro->status.car.local_ret,p_carro->status.dados[0].local_dev);
+
     }
     altera(p_carro, p_cli->reg_car, p_cli);
 
