@@ -782,6 +782,19 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         return -1;
     }
 
+    printf("\nDia_ret[0] %i",p_carro->status.dados[0].dia_ret);
+    printf("\nMes_ret[0] %i",p_carro->status.dados[0].mes_ret);
+    printf("\nDia_dev[0] %i",p_carro->status.dados[0].dia_dev);
+    printf("\nMes_dev[0] %i",p_carro->status.dados[0].mes_dev);
+    
+    printf("\nDia_ret[1] %i",p_carro->status.dados[1].dia_ret);
+    printf("\nMes_ret[1] %i",p_carro->status.dados[1].mes_ret);
+    printf("\nDia_dev[1] %i",p_carro->status.dados[1].dia_dev);
+    printf("\nMes_dev[1] %i",p_carro->status.dados[1].mes_dev);
+
+
+    float valor = calculaValorAPagar(p_carro);
+
     if(p_carro->status.car.sigla == 'R'){
         p_carro->status.car.sigla = 'A';
 
@@ -806,8 +819,6 @@ int devolucao(carro *p_carro, cliente *p_cli) {
     }
     altera(p_carro, p_cli->reg_car, p_cli);
 
-    float valor = calculaValorAPagar(p_carro);
-
     return lugarDoCliente;
 }
 
@@ -816,15 +827,32 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
     if (pos==1) p_carro->status.dados[pos].sigla = 'R';
     p_carro->status.dados[pos].reg_cli = p_cli->reg_cli;
 
-    int dia_ret;
-    printf("\nDia de retirada: ");
-    dia_ret = escolhe_entre_numeros(1,30);
-    p_carro->status.dados[pos].dia_ret = dia_ret;
+    if(pos==1){
+        p_carro->status.dados[1].dia_ret = p_carro->status.dados[0].dia_dev + 1 ;
 
-    int mes_ret;
-    printf("\nMes de retirada: ");
-    mes_ret=escolhe_entre_numeros(1,12);
-    p_carro->status.dados[pos].mes_ret = mes_ret;
+        //Parte que virifica se a data não passa de 30 e 12 para dia e mes
+    
+        if(p_carro->status.dados[1].dia_ret > 30){
+            p_carro->status.dados[1].dia_ret = 1;
+            p_carro->status.dados[1].mes_ret +=1;
+        }
+
+        if(p_carro->status.dados[1].mes_ret > 12){
+            p_carro->status.dados[1].mes_ret = 1;
+        }
+
+    }else{
+        int dia_ret;
+        printf("\nDia de retirada: ");
+        dia_ret = escolhe_entre_numeros(1,30);
+        p_carro->status.dados[pos].dia_ret = dia_ret;
+
+        int mes_ret;
+        printf("\nMes de retirada: ");
+        mes_ret=escolhe_entre_numeros(1,12);
+        p_carro->status.dados[pos].mes_ret = mes_ret;
+    }
+
 
     int dia_dev;
     printf("\nDia de devolucao: ");
@@ -896,6 +924,7 @@ float calculaValorAPagar(carro *p_carro){
 
     float multa = 0;
     int dias_ate_dev = calculaDiasEntreDatas(dia_retorno, mes_retorno, p_carro);
+    printf("\nDia de dev: %i\nMes de dev: %i", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
     int dias_ate_multa = calculaDiasEntreDatas(p_carro->status.dados[0].dia_dev,p_carro->status.dados[0].mes_dev, p_carro);
     int dias_utilizados;
     if(dias_ate_multa < dias_ate_dev){
