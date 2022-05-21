@@ -125,6 +125,7 @@ void consulta_nova(carro *p_carro);
 char escolhe_tipo();
 int escolhe_entre_numeros(int numero_a, int numero_b);
 int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca);
+int tem_no_lugar_certo(carro *p_carro, char *local);
 
 int main()
 {
@@ -817,29 +818,25 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
 
     int dia_ret;
     printf("\nDia de retirada: ");
-    fflush(stdin);
-    scanf("%i", &dia_ret);
-    fflush(stdin);
+    dia_ret = escolhe_entre_numeros(1,30);
     p_carro->status.dados[pos].dia_ret = dia_ret;
 
     int mes_ret;
     printf("\nMes de retirada: ");
-    scanf("%i", &mes_ret);
-    fflush(stdin);
+    mes_ret=escolhe_entre_numeros(1,12);
     p_carro->status.dados[pos].mes_ret = mes_ret;
 
     int dia_dev;
     printf("\nDia de devolucao: ");
-    scanf("%i", &dia_dev);
-    fflush(stdin);
+    dia_dev=escolhe_entre_numeros(1,30);
     p_carro->status.dados[pos].dia_dev = dia_dev;
 
     int mes_dev;
     printf("\nMes de devolucao: ");
-    scanf("%i", &mes_dev);
+    mes_dev=escolhe_entre_numeros(1,12);
     fflush(stdin);
-
     p_carro->status.dados[pos].mes_dev = mes_dev;
+    
     printf("\nEscolha uma cidade para devolver o carro: ");
     strcpy(p_carro->status.dados[pos].local_dev , escolheCidade());
 }
