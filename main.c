@@ -129,6 +129,7 @@ int tem_no_lugar_certo(carro *p_carro, char *local);
 void apresenta_dados_carro(carro *p_carro);
 void consulta_total_nova_para_teste(carro *p_carro);
 void consulta_total_cliente_tabela(cliente *p_cliente);
+void consulta_total_vip(vip *p_vip);
 
 int main()
 {
@@ -197,6 +198,9 @@ int main()
             break;
         case 13:
             consulta_total_cliente_tabela(p_cli);
+            break;
+        case 14:
+            consulta_total_vip(p_vip);
             break;
         default:
             printf("\nEscolha uma opcao valida\n");
@@ -818,9 +822,8 @@ void consulta_total_cliente_tabela(cliente *p_cliente){
             fseek(ar,i*sizeof(cliente),0);
             fread(p_cliente,sizeof(cliente),1,ar);
             if(p_cliente->reg_cli!=-1){
+                printf("|%-7i|%-30s|%-20s|%3c%2s|%4i%3s|\n",p_cliente->reg_cli,p_cliente->nome, p_cliente->CPF, p_cliente->sigla,"", p_cliente->reg_car,"");
             }
-            printf("|%-7i|%-30s|%-20s|%3c%2s|%4i%3s|\n",p_cliente->reg_cli,p_cliente->nome, p_cliente->CPF, p_cliente->sigla,"", p_cliente->reg_car,"");
-
         }
     }
 }
@@ -998,6 +1001,28 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
     printf("\nEscolha uma cidade para devolver o carro: ");
     strcpy(p_carro->status.dados[pos].local_dev , escolheCidade());
 }
+
+void consulta_total_vip(vip *p_vip){
+    int i;
+    FILE *ar = NULL;
+
+    int num_de_vip = verifica_arquivo_vip();
+    if ((ar = fopen("vip.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        printf("|%-7s|%-30s|%-20s|%-5s|\n","Reg_cli","Nome","CPF","Sigla");
+
+        for (i = 0; i < num_de_vip; i++)
+        {
+            fseek(ar,i*sizeof(vip),0);
+            fread(p_vip,sizeof(vip),1,ar);
+            printf("|%-7i|%-30s|%-20s|%3c%2s|\n",p_vip->reg_cli,p_vip->nome, p_vip->CPF, p_vip->tipo,"");
+
+        }
+    }
+}
+
 
 //Verifica todos os carros cadastrados.
 //Faz um print de todos os carros cadastrados no sistema
