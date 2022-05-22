@@ -144,7 +144,7 @@ int main()
     int numero;
     do
     {
-        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Devolução\n[5]Consulta Cliente Antigo\n[6]Fim\nOpcao:");
+        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Devolucao\n[5]Consulta Cliente Antigo\n[6]Fim\nOpcao:");
         scanf("%i", &op);
         fflush(stdin);
         switch (op)
@@ -472,8 +472,6 @@ void grava_cliente(cliente *p, char *str, int pos)
     {
         if(strcmp(str,"rb+")==0)
             fseek(fptr,pos*sizeof(cliente),0);
-            printf("\nreg car do p_cli : %i",p->reg_car);
-            printf("\nnome_cli = %s", p->nome);
         fwrite(p,sizeof(cliente),1,fptr);
     }//else
     fclose(fptr);
@@ -490,7 +488,6 @@ void aloca_cliente(cliente **p, int q)
 
 void grava_carro(carro *p,char *str,int pos)
 {
-printf("\nSigla antes de salvar: %c\n", p->status.car.sigla);
 FILE *fptr=NULL;
 if((fptr=fopen("carro.bin",str))==NULL)
   printf("\nErro ao abrir o arquivo");
@@ -552,7 +549,6 @@ void altera(carro *p_carro, int reg_car, cliente *p_cli){
     //printf("\nSigla no altera: %c" ,p_carro->status.car.sigla);
 
     //como a sigla está no valor antigo, a gente volta para o valor novo
-    printf("\nReg antes de gravar: %i\n", p_carro->reg_car);
     grava_carro(p_carro, "rb+",pos);
 }
 
@@ -597,13 +593,9 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     int n = verifica_arquivo_cliente(); 
 	int ind;
     ind = busca_vago_cliente(p_cli, n);
-    printf("\nn = %i", n);
-    printf("\nInd = %i", ind);
     if(ind!=-1){
         n=ind;
     }
-    printf("\nn = %i", n);
-    printf("\nInd = %i", ind);
     p_cli->reg_cli = n+1;
 
     //printf("ANtes");
@@ -611,20 +603,17 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
         aloca_carro(&p_carro, 1);
     }
     busca(p_carro, op_carro);
-
     p_cli->reg_car = op_carro;
     p_cli->sigla = p_carro->tipo;
     printf("\nRegistro: %i\n", p_cli->reg_cli);
     printf("\nNome: ");
     gets(p_cli->nome);
-    //Boolean valido = cpf_valido
   	
     p_cli->reg_car = op_carro;
     printf("\nModelo: %s",p_carro->modelo);
     printf("\nSigla: %c" ,p_carro->status.car.sigla);
     
 
-    //João, aqui que tem que fazer a lógica das siglas
     if((p_carro->status.car.sigla) == 'L')
         p_carro->status.car.sigla = 'A';
     else if((p_carro->status.car.sigla) == 'A'){
@@ -644,13 +633,9 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     //printf("\nSigla: %c" ,p_carro->status.car.sigla);    
     //A maracutaia está na função salvar
     altera(p_carro, op_carro, p_cli);
-    printf("\nreg car do p_cli : %i",p_cli->reg_car);
     if(ind==-1){
-        printf("\nDentro do ind");
         grava_cliente(p_cli,"ab", 1);
     }else{
-        printf("\nFora do ind");
-
         grava_cliente(p_cli,"rb+", n);
     }
     
@@ -740,7 +725,8 @@ void consulta_total_cliente(cliente *p_cliente)
         {
             fseek(ar,i*sizeof(cliente),0);
             fread(p_cliente,sizeof(cliente),1,ar);
-            printf("\nRegistro do cliente: %i\nNome: %s\nCPF: %s\nSigla: %c\nN do registro do carro: %i\n", p_cliente->reg_cli, p_cliente->nome, p_cliente->CPF, p_cliente->sigla, p_cliente->sigla, p_cliente->reg_car);
+            printf("\nRegistro do cliente: %i\nNome: %s\nCPF: %s\nSigla: %c", p_cliente->reg_cli, p_cliente->nome, p_cliente->CPF, p_cliente->sigla, p_cliente->sigla);
+            printf("\nN do registro do carro: %i\n", p_cliente->reg_car);
 
         }
     }
@@ -837,14 +823,11 @@ int devolucao(carro *p_carro, cliente *p_cli) {
 
         //A sigla está dando erro, parece que a sigla de dados[1] não recebe os valores
         //p_carro->status.dados[0].sigla = p_carro->status.dados[1].sigla;
-
-
     }
     else
     {
         p_carro->status.car.sigla = 'L';
         strcpy(p_carro->status.car.local_ret,p_carro->status.dados[0].local_dev);
-
     }
     altera(p_carro, p_cli->reg_car, p_cli);
 
@@ -948,7 +931,7 @@ float calculaValorAPagar(carro *p_carro){
     fflush(stdin);
     printf("\nQual o dia do retorno: ");
     scanf("%i", &dia_retorno);
-    printf("\nQUal o mês de retorno: ");
+    printf("\nQUal o mes de retorno: ");
     scanf("%i", &mes_retorno);
 
     float multa = 0;
@@ -960,7 +943,6 @@ float calculaValorAPagar(carro *p_carro){
         multa = (p_carro->diaria)*2 * (dias_ate_dev - dias_ate_multa);
         printf("\n %.2f", multa);
         dias_utilizados = dias_ate_multa;
-        printf("\nDias ate multa: %i", dias_utilizados);
     }
     else{
         dias_utilizados = dias_ate_dev;
