@@ -797,8 +797,9 @@ int verifica_arquivo_vip()
 }
 
 void deletaCliente(cliente *p_cli, vip *p_vip, int pos){
+    int n_de_vip = verifica_arquivo_vip();
     strcpy(p_vip->nome, p_cli->nome);
-    p_vip->reg_cli = p_cli->reg_cli;
+    p_vip->reg_cli = n_de_vip+1;
     strcpy(p_vip->CPF, p_cli->CPF );
     p_vip->tipo = p_cli->sigla;
     p_cli->reg_cli=-1;
