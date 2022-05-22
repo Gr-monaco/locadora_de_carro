@@ -127,6 +127,7 @@ int escolhe_entre_numeros(int numero_a, int numero_b);
 int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca);
 int tem_no_lugar_certo(carro *p_carro, char *local);
 void apresenta_dados_carro(carro *p_carro);
+void consulta_total_nova_para_teste(carro *p_carro);
 
 int main()
 {
@@ -181,6 +182,14 @@ int main()
             break;
         case 11:
             consulta_nova(p_carro);
+            break;
+        case 12:
+            printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
+            printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+            printf("%-8s|", "LDev");
+            printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+            printf("%-8s|", "LDev");
+            consulta_total_nova_para_teste(p_carro);
             break;
         default:
             printf("\nEscolha uma opcao valida\n");
@@ -410,6 +419,80 @@ void apresenta_dados_carro(carro *p_carro){
     }
 }
 
+void apresenta_dados_carro_tabela(carro *p_carro){
+    printf("\n|%-7i|%-20s|%-4c|%-6.2f ", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria );
+    if(p_carro->status.car.sigla == 'L'){
+        printf("|%-5c|%-9s", p_carro->status.car.sigla, p_carro->status.car.local_ret);
+        char vazio[50] = "-------------------------";
+        printf("|%.-3s|%.-6s|%.-6s|",vazio, vazio, vazio);
+        printf("%.-8s|", vazio);
+        printf("%.-5s", vazio);
+        printf("|%.-9s|%.-3s|%.-6s|%.-6s|%.-8s|",vazio, vazio, vazio, vazio, vazio);
+
+    }
+    if(p_carro->status.car.sigla=='A'){
+        printf("|%-5c|%-9s", 'A', p_carro->status.dados[0].local_ret);
+        printf("|%-3i",p_carro->status.dados[0].reg_cli);
+        char data[6];
+        sprintf(data, "%i", p_carro->status.dados[0].dia_ret);
+        sprintf(data + strlen(data), "/");
+        sprintf(data + strlen(data), "%i", p_carro->status.dados[0].mes_ret);
+        char data2[6];
+        sprintf(data2, "%i", p_carro->status.dados[0].dia_dev);
+        sprintf(data2 + strlen(data2), "/");
+        sprintf(data2 + strlen(data2), "%i", p_carro->status.dados[0].mes_dev);
+        printf("|%-6s|%-6s|%-8s|",data, data2, p_carro->status.dados[0].local_dev );
+        
+        char vazio[50] = "-------------------------";
+        printf("%.-5s", vazio);
+        printf("|%.-9s|%.-3s|%.-6s|%.-6s|%.-8s|",vazio, vazio, vazio, vazio, vazio);
+    }
+    if(p_carro->status.car.sigla=='R'){
+        printf("|%-5c|%-9s", 'A', p_carro->status.dados[0].local_ret);
+
+        printf("|%-3i",p_carro->status.dados[0].reg_cli);
+        char data[6];
+        sprintf(data, "%i", p_carro->status.dados[0].dia_ret);
+        sprintf(data + strlen(data), "/");
+        sprintf(data + strlen(data), "%i", p_carro->status.dados[0].mes_ret);
+        char data2[6];
+        sprintf(data2, "%i", p_carro->status.dados[0].dia_dev);
+        sprintf(data2 + strlen(data2), "/");
+        sprintf(data2 + strlen(data2), "%i", p_carro->status.dados[0].mes_dev);
+        printf("|%-6s|%-6s|%-8s",data, data2, p_carro->status.dados[0].local_dev );
+        printf("|%-5c|%-9s", 'R', p_carro->status.dados[1].local_ret);
+        printf("|%-3i",p_carro->status.dados[1].reg_cli);
+        char data3[6];
+        sprintf(data3, "%i", p_carro->status.dados[1].dia_ret);
+        sprintf(data3 + strlen(data3), "/");
+        sprintf(data3 + strlen(data3), "%i", p_carro->status.dados[1].mes_ret);
+        char data4[6];
+        sprintf(data4, "%i", p_carro->status.dados[1].dia_dev);
+        sprintf(data4 + strlen(data4), "/");
+        sprintf(data4 + strlen(data4), "%i", p_carro->status.dados[1].mes_dev);
+        printf("|%-6s|%-6s|%-8s|",data3, data4, p_carro->status.dados[1].local_dev );
+    }
+}   
+
+void consulta_total_nova_para_teste(carro *p_carro){
+    int i;
+    FILE *ar = NULL;
+
+    int numero_de_carro = verifica_arquivo_carro();
+    if ((ar = fopen("carro.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        for (i = 0; i < numero_de_carro; i++)
+        {
+            fseek(ar,i*sizeof(carro),0);
+            fread(p_carro,sizeof(carro),1,ar);
+            apresenta_dados_carro_tabela(p_carro);
+
+        }
+    }
+}
+
 //Verifica todos os carros cadastrados.
 //Faz um print de todos os carros cadastrados no sistema
 //@param p_carro Ponteiro de carros utilizado
@@ -588,7 +671,7 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
         printf("\nCliente esta alugando carro");
         return;
     }
-    strcpy(p_cli->CPF,cpf_a_comparar);
+    
     
     int n = verifica_arquivo_cliente(); 
 	int ind;
@@ -603,6 +686,8 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
         aloca_carro(&p_carro, 1);
     }
     busca(p_carro, op_carro);
+    strcpy(p_cli->CPF,cpf_a_comparar);
+    printf("\nCpf do novo cliente: %s", p_cli->CPF);
     p_cli->reg_car = op_carro;
     p_cli->sigla = p_carro->tipo;
     printf("\nRegistro: %i\n", p_cli->reg_cli);
@@ -853,6 +938,8 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
             p_carro->status.dados[1].mes_ret = 1;
         }
 
+        strcpy(p_carro->status.dados[1].local_ret,p_carro->status.dados[0].local_dev);
+
     }else{
         int dia_ret;
         printf("\nDia de retirada: ");
@@ -863,6 +950,8 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
         printf("\nMes de retirada: ");
         mes_ret=escolhe_entre_numeros(1,12);
         p_carro->status.dados[pos].mes_ret = mes_ret;
+
+        strcpy(p_carro->status.dados[0].local_ret, p_carro->status.car.local_ret);
     }
 
 
