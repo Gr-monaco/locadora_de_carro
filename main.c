@@ -130,6 +130,7 @@ void apresenta_dados_carro(carro *p_carro);
 void consulta_total_nova_para_teste(carro *p_carro);
 void consulta_total_cliente_tabela(cliente *p_cliente);
 void consulta_total_vip(vip *p_vip);
+void apresenta_dados_carro_tabela(carro *p_carro);
 
 int main()
 {
@@ -158,7 +159,7 @@ int main()
             cadastra_carro(p_carro, 1);
             break;
         case 2:
-            consulta_total(p_carro);
+            consulta_nova(p_carro);
             printf("\nDigite o registro do carro que deseja alugar: ");
             scanf("%i", &op_carro);
             fflush(stdin);
@@ -186,14 +187,6 @@ int main()
             consulta_nova(p_carro);
             break;
         case 12:
-            printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
-            printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
-            printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
-            printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
-            printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
-            printf("%-8s|", "LDev");
-            printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
-            printf("%-8s|", "LDev");
             consulta_total_nova_para_teste(p_carro);
             break;
         case 13:
@@ -395,15 +388,22 @@ void consulta_nova(carro *p_carro){
         printf("\nErro");
     else
     {
+        printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
+        printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
+        printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
+        printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
+        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+        printf("%-8s|", "LDev");
+        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+        printf("%-8s|", "LDev");
         for (i = 0; i < numero_de_carro; i++)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
             verifica_dia_livre = verifica_se_esta_livre(p_carro, dia_entrega, mes_entrega);
-            printf("\n %i %c %i %i", p_carro->reg_car, p_carro->tipo, tem_no_lugar_certo(p_carro, local_busca), verifica_dia_livre);
             if(p_carro->tipo==tipo_busca && tem_no_lugar_certo(p_carro, local_busca)==1
                 && verifica_dia_livre==1){
-                apresenta_dados_carro(p_carro);
+                apresenta_dados_carro_tabela(p_carro);
             }
         }
     }
@@ -494,6 +494,14 @@ void consulta_total_nova_para_teste(carro *p_carro){
         printf("\nErro");
     else
     {
+        printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
+        printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
+        printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
+        printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
+        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+        printf("%-8s|", "LDev");
+        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+        printf("%-8s|", "LDev");
         for (i = 0; i < numero_de_carro; i++)
         {
             fseek(ar,i*sizeof(carro),0);
