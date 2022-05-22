@@ -184,6 +184,9 @@ int main()
             consulta_nova(p_carro);
             break;
         case 12:
+            printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
+            printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
+            printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
             printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
             printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
             printf("%-8s|", "LDev");
