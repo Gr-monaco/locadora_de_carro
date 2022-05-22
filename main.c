@@ -131,6 +131,7 @@ void consulta_total_nova_para_teste(carro *p_carro);
 void consulta_total_cliente_tabela(cliente *p_cliente);
 void consulta_total_vip(vip *p_vip);
 void apresenta_dados_carro_tabela(carro *p_carro);
+void header_carro();
 
 int main()
 {
@@ -146,6 +147,7 @@ int main()
     int op, op_carro;
     info_carro a;
     int numero;
+    int pos;
     do
     {
         printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Devolucao\n[5]Consulta Cliente Antigo\n[6]Fim\nOpcao:");
@@ -171,7 +173,7 @@ int main()
             system("pause");
             break;
         case 4:
-            int pos = devolucao(p_carro, p_cli);
+            pos = devolucao(p_carro, p_cli);
             if(pos!=-1) deletaCliente(p_cli, p_vip, pos);
             break;
         case 5:
@@ -388,14 +390,7 @@ void consulta_nova(carro *p_carro){
         printf("\nErro");
     else
     {
-        printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
-        printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
-        printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
-        printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
-        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
-        printf("%-8s|", "LDev");
-        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
-        printf("%-8s|", "LDev");
+        header_carro();
         for (i = 0; i < numero_de_carro; i++)
         {
             fseek(ar,i*sizeof(carro),0);
@@ -494,14 +489,7 @@ void consulta_total_nova_para_teste(carro *p_carro){
         printf("\nErro");
     else
     {
-        printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
-        printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
-        printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
-        printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
-        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
-        printf("%-8s|", "LDev");
-        printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
-        printf("%-8s|", "LDev");
+        header_carro();
         for (i = 0; i < numero_de_carro; i++)
         {
             fseek(ar,i*sizeof(carro),0);
@@ -626,7 +614,7 @@ else
 return achou;  //posicao do registro
 }//busca
 
-
+//Não deletar, se deletar pode quebrar tudo
 void altera(carro *p_carro, int reg_car, cliente *p_cli){
     //Pega o valor que está no ponteiro
 
@@ -711,6 +699,7 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     p_cli->sigla = p_carro->tipo;
     printf("\nRegistro: %i\n", p_cli->reg_cli);
     printf("\nNome: ");
+    fflush(stdin);
     gets(p_cli->nome);
   	
     p_cli->reg_car = op_carro;
@@ -724,7 +713,9 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
         p_carro->status.car.sigla = 'R';
     }
     else {
-        printf("\nCarro ja reservado!");
+        printf("\nCarro ja reservado!\n");
+        header_carro();
+        apresenta_dados_carro_tabela(p_carro);
         return;
     }
 
@@ -873,7 +864,7 @@ else
       fseek(fptr,i*sizeof(cliente),0);
       fread(p_cli,sizeof(cliente),1,fptr);
       sobra = strcmp(p_cli->CPF, cpf_devolucao);
-      if(sobra==0)
+      if(sobra==0 && p_cli->reg_cli !=-1)
         {
          achou=i;
          i=qreg;  //forca a saida do for
@@ -1126,4 +1117,15 @@ char* escolheCidade(){
             break;
         }
     } while (op_correta==-1);
+}
+
+void header_carro(){
+    printf("%-9s%-21s%-5s%-7s|%43s%42s|\n", "","","","","Status","");
+    printf("%-9s%-21s%-5s%-7s|%12s%3s", "","","","","Info_carro","");
+    printf("|%19s%7s|%12s%3s|%19s%7s|\n","Info_cliente","","Info_carro","","Info_cliente","");
+    printf("|%-5s|%-20s|%-1s|%-7s|", "reg_car","Modelo","Tipo","Diaria");
+    printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+    printf("%-8s|", "LDev");
+    printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
+    printf("%-8s|", "LDev");
 }
