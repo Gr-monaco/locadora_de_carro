@@ -128,6 +128,7 @@ int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca);
 int tem_no_lugar_certo(carro *p_carro, char *local);
 void apresenta_dados_carro(carro *p_carro);
 void consulta_total_nova_para_teste(carro *p_carro);
+void consulta_total_cliente_tabela(cliente *p_cliente);
 
 int main()
 {
@@ -193,6 +194,9 @@ int main()
             printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
             printf("%-8s|", "LDev");
             consulta_total_nova_para_teste(p_carro);
+            break;
+        case 13:
+            consulta_total_cliente_tabela(p_cli);
             break;
         default:
             printf("\nEscolha uma opcao valida\n");
@@ -797,6 +801,28 @@ void deletaCliente(cliente *p_cli, vip *p_vip, int pos){
     grava_cliente(p_cli, "rb+", pos);
     int numeroVips = verifica_arquivo_vip();
     gravaClienteAntigo(p_vip, "rb+", numeroVips);
+}
+
+void consulta_total_cliente_tabela(cliente *p_cliente){
+    int i;
+    FILE *ar = NULL;
+
+    int numero_de_cliente = verifica_arquivo_cliente();
+    if ((ar = fopen("cliente.bin", "rb")) == NULL)
+        printf("\nErro");
+    else
+    {
+        printf("|%-7s|%-30s|%-20s|%-5s|%-7s|\n","Reg_cli","Nome","CPF","Sigla","Reg_car");
+        for (i = 0; i <numero_de_cliente; i++)
+        {
+            fseek(ar,i*sizeof(cliente),0);
+            fread(p_cliente,sizeof(cliente),1,ar);
+            if(p_cliente->reg_cli!=-1){
+            }
+            printf("|%-7i|%-30s|%-20s|%3c%2s|%4i%3s|\n",p_cliente->reg_cli,p_cliente->nome, p_cliente->CPF, p_cliente->sigla,"", p_cliente->reg_car,"");
+
+        }
+    }
 }
 
 void consulta_total_cliente(cliente *p_cliente)
