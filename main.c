@@ -386,10 +386,13 @@ void consulta_nova(carro *p_carro){
     int mes_entrega = -1;
     char tipo_busca = ' ';
     char local_busca[30] = "Sem escolha";
-    printf("\nEscolha um dia: ");
-    dia_entrega = escolhe_entre_numeros(1,30);
+
     printf("\nEscolha um mes: ");
     mes_entrega = escolhe_entre_numeros(1,12);
+
+    int numero_de_dias_maximo = escolhe_dia_baseado_mes(mes_entrega);
+    printf("\nEscolha um dia: ");
+    dia_entrega = escolhe_entre_numeros(1,numero_de_dias_maximo);
     tipo_busca = escolhe_tipo();
     strcpy(local_busca, escolheCidade());
 
@@ -980,30 +983,36 @@ void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
         strcpy(((p_carro->status.dados)+1)->local_ret,((p_carro->status.dados)+0)->local_dev);
 
     }else{
-        int dia_ret;
-        printf("\nDia de retirada: ");
-        dia_ret = escolhe_entre_numeros(1,30);
-        ((p_carro->status.dados)+pos)->dia_ret = dia_ret;
 
         int mes_ret;
         printf("\nMes de retirada: ");
         mes_ret=escolhe_entre_numeros(1,12);
         ((p_carro->status.dados)+pos)->mes_ret = mes_ret;
 
+        int dia_maximos_mes = escolhe_dia_baseado_mes(mes_ret);
+        int dia_ret;
+        printf("\nDia de retirada: ");
+        dia_ret = escolhe_entre_numeros(1,dia_maximos_mes);
+        ((p_carro->status.dados)+pos)->dia_ret = dia_ret;
+
+        
+
         strcpy(((p_carro->status.dados)+0)->local_ret, p_carro->status.car.local_ret);
     }
 
-
-    int dia_dev;
-    printf("\nDia de devolucao: ");
-    dia_dev=escolhe_entre_numeros(1,30);
-    ((p_carro->status.dados)+pos)->dia_dev = dia_dev;
 
     int mes_dev;
     printf("\nMes de devolucao: ");
     mes_dev=escolhe_entre_numeros(1,12);
     fflush(stdin);
     ((p_carro->status.dados)+pos)->mes_dev = mes_dev;
+    
+    int dia_maximo_2 = escolhe_dia_baseado_mes(mes_dev);
+    int dia_dev;
+    printf("\nDia de devolucao: ");
+    dia_dev=escolhe_entre_numeros(1,dia_maximo_2);
+    ((p_carro->status.dados)+pos)->dia_dev = dia_dev;
+
     
     printf("\nEscolha uma cidade para devolver o carro: ");
     strcpy(((p_carro->status.dados)+pos)->local_dev , escolheCidade());
@@ -1078,11 +1087,14 @@ float calculaValorAPagar(carro *p_carro){
     int dia_retorno, mes_retorno;
     int temMulta = 0;
 
-    fflush(stdin);
-    printf("\nQual o dia do retorno: ");
-    dia_retorno = escolhe_entre_numeros(1,30);
     printf("\nQUal o mes de retorno: ");
     mes_retorno = escolhe_entre_numeros(1, 12);
+
+    int dia_maximo = escolhe_dia_baseado_mes(mes_retorno);
+    fflush(stdin);
+    printf("\nQual o dia do retorno: ");
+    dia_retorno = escolhe_entre_numeros(1,dia_maximo);
+
 
     float multa = 0;
     int dias_ate_dev = calculaDiasEntreDatas(dia_retorno, mes_retorno, p_carro);
