@@ -150,59 +150,70 @@ int main()
     int pos;
     do
     {
-        printf("\n[1]Cadastrar carro\n[2]Consulta Total/Aluguel de Carro\n[3]Consulta Parcial\n[4]Devolucao\n[5]Consulta Cliente Antigo\n[6]Fim\nOpcao:");
+        system("cls");
+        printf("\n[1]Cadastrar carro\n[2]Consulta Total\n[3]Consulta Parcial\n[4]Alugar Carro\n[5]Consulta Cliente\n[6]Devolucao\n[7]Consulta Cliente Antigo\n[0]Fim\nOpcao:");
         scanf("%i", &op);
         fflush(stdin);
         switch (op)
         {
         case 1:
+            system("cls");
             strcpy(a.local_ret, "\nCadastro");
             printf("%s\n", a.local_ret);
             cadastra_carro(p_carro, 1);
             break;
         case 2:
+        	system("cls");
+            consulta_total_nova_para_teste(p_carro);
+            printf("\n");
+            system("pause");
+            break;
+        case 3:
+            system("cls");
+            consulta_nova(p_carro);
+            printf("\n");
+            system("pause");
+            break;
+        case 4:
+            system("cls");
             consulta_nova(p_carro);
             printf("\nDigite o registro do carro que deseja alugar: ");
             scanf("%i", &op_carro);
             fflush(stdin);
             //printf("Antes de cadastro cliente");
 			cadastro_cliente(op_carro, p_cli,p_carro);
-            break;
-        case 3:
-            consulta_se_tem_livre_por_tipo(p_carro);
+            printf("\n");
             system("pause");
             break;
-        case 4:
+        case 5:
+            system("cls");
+            consulta_total_cliente_tabela(p_cli);
+            printf("\n");
+            system("pause");
+            break;    
+        case 6:
+            system("cls");
             pos = devolucao(p_carro, p_cli);
             if(pos!=-1) deletaCliente(p_cli, p_vip, pos);
+            printf("\n");
+            system("pause");
             break;
-        case 5:
-            consulta_historico_cliente(p_vip);
-            break;
-        case 9:
-            consulta_de_teste(p_carro);
-            break;
-        case 10:
-            consulta_total_cliente(p_cli);
-            break;
-        case 11:
-            consulta_nova(p_carro);
-            break;
-        case 12:
-            consulta_total_nova_para_teste(p_carro);
-            break;
-        case 13:
-            consulta_total_cliente_tabela(p_cli);
-            break;
-        case 14:
+        case 7:
+            system("cls");
             consulta_total_vip(p_vip);
+            printf("\n");
+            system("pause");
             break;
+        case 0:
+        	break;
         default:
+            system("cls");
             printf("\nEscolha uma opcao valida\n");
+            system("pause");
             break;
         } // switch
 
-    } while (op != 6);
+    } while (op != 0);
     system("pause");
     return 1;
 }
@@ -694,7 +705,6 @@ void cadastro_cliente(int op_carro, cliente *p_cli, carro *p_carro) {
     }
     busca(p_carro, op_carro);
     strcpy(p_cli->CPF,cpf_a_comparar);
-    printf("\nCpf do novo cliente: %s", p_cli->CPF);
     p_cli->reg_car = op_carro;
     p_cli->sigla = p_carro->tipo;
     printf("\nRegistro: %i\n", p_cli->reg_cli);
@@ -868,7 +878,6 @@ else
         {
          achou=i;
          i=qreg;  //forca a saida do for
-         printf("\nCPF = %s foi encontrado no sistema!\n", p_cli->CPF);
   	}//if
   }//for
   fclose(fptr);   //DENTRO do else - abriu com rb   
@@ -891,12 +900,10 @@ else
      {
       fseek(fptr,i*sizeof(carro),0);
       fread(p_carro,sizeof(carro),1,fptr);
-      printf("\n reg cli no carro[0] -> %i",p_carro->status.dados[0].reg_cli);
       if(p_carro->status.dados[0].reg_cli==reg_cli)
         {
          achou=i;
          i=qreg;  //forca a saida do for
-         printf("\nCarro foi encontrado no sistema!\n");
   	}//if
   }//for
   fclose(fptr);   //DENTRO do else - abriu com rb   
@@ -1073,9 +1080,9 @@ float calculaValorAPagar(carro *p_carro){
 
     fflush(stdin);
     printf("\nQual o dia do retorno: ");
-    scanf("%i", &dia_retorno);
+    dia_retorno = escolhe_entre_numeros(1,30);
     printf("\nQUal o mes de retorno: ");
-    scanf("%i", &mes_retorno);
+    mes_retorno = escolhe_entre_numeros(1, 12);
 
     float multa = 0;
     int dias_ate_dev = calculaDiasEntreDatas(dia_retorno, mes_retorno, p_carro);
