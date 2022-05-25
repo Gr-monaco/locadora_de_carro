@@ -338,14 +338,14 @@ int verifica_se_esta_livre(carro *p_carro, int dia_busca, int mes_busca){
     }
 
     if(p_carro->status.car.sigla=='A'){
-        if((p_carro->status.dados[0].dia_dev < dia_busca && p_carro->status.dados[0].mes_dev == mes_busca) || p_carro->status.dados[0].mes_dev < mes_busca ){
+        if((((p_carro->status.dados)+0)->dia_dev < dia_busca && ((p_carro->status.dados)+0)->mes_dev == mes_busca) || ((p_carro->status.dados)+0)->mes_dev < mes_busca ){
             boleano = 1;
             return boleano;
         }
     }
 
     if(p_carro->status.car.sigla=='R'){
-        if((p_carro->status.dados[1].dia_dev < dia_busca && p_carro->status.dados[1].mes_dev == mes_busca) || p_carro->status.dados[1].mes_dev < mes_busca ){
+        if((((p_carro->status.dados)+1)->dia_dev < dia_busca && ((p_carro->status.dados)+1)->mes_dev == mes_busca) || ((p_carro->status.dados)+1)->mes_dev < mes_busca ){
             boleano = 1;
             return boleano;
         }
@@ -365,14 +365,14 @@ int tem_no_lugar_certo(carro *p_carro, char *local){
     }
 
     if(p_carro->status.car.sigla == 'A'){
-        if(strcmp(p_carro->status.dados[0].local_dev, local)==0){
+        if(strcmp(((p_carro->status.dados)+0)->local_dev, local)==0){
             retorno = 1;
             return retorno;
         }
     }
 
     if(p_carro->status.car.sigla == 'R'){
-        if(strcmp(p_carro->status.dados[1].local_dev, local)==0){
+        if(strcmp(((p_carro->status.dados)+1)->local_dev, local)==0){
             retorno = 1;
             return retorno;
         }
@@ -425,14 +425,14 @@ void apresenta_dados_carro(carro *p_carro){
     else if (p_carro->status.car.sigla == 'A')
     {
         printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %.2f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
-        printf("Local de devolucao: %s\n", p_carro->status.dados[0].local_dev);
-        printf("Dia devolucao: %i / %i\n", p_carro->status.dados[0].dia_dev, p_carro->status.dados[0].mes_dev);
+        printf("Local de devolucao: %s\n", ((p_carro->status.dados)+0)->local_dev);
+        printf("Dia devolucao: %i / %i\n", ((p_carro->status.dados)+0)->dia_dev, ((p_carro->status.dados)+0)->mes_dev);
     }
     else
     {
         printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %.2f\nStatus: %c\n", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.car.sigla);
-        printf("Local de devolucao: %s\n", p_carro->status.dados[1].local_dev);
-        printf("Dia devolucao: %i / %i\n", p_carro->status.dados[1].dia_dev, p_carro->status.dados[1].mes_dev);
+        printf("Local de devolucao: %s\n", ((p_carro->status.dados)+1)->local_dev);
+        printf("Dia devolucao: %i / %i\n", ((p_carro->status.dados)+1)->dia_dev, ((p_carro->status.dados)+1)->mes_dev);
     }
 }
 
@@ -448,46 +448,46 @@ void apresenta_dados_carro_tabela(carro *p_carro){
 
     }
     if(p_carro->status.car.sigla=='A'){
-        printf("|%-5c|%-9s", 'A', p_carro->status.dados[0].local_ret);
-        printf("|%-3i",p_carro->status.dados[0].reg_cli);
+        printf("|%-5c|%-9s", 'A', ((p_carro->status.dados)+0)->local_ret);
+        printf("|%-3i",((p_carro->status.dados)+0)->reg_cli);
         char data[6];
-        sprintf(data, "%i", p_carro->status.dados[0].dia_ret);
+        sprintf(data, "%i", ((p_carro->status.dados)+0)->dia_ret);
         sprintf(data + strlen(data), "/");
-        sprintf(data + strlen(data), "%i", p_carro->status.dados[0].mes_ret);
+        sprintf(data + strlen(data), "%i", ((p_carro->status.dados)+0)->mes_ret);
         char data2[6];
-        sprintf(data2, "%i", p_carro->status.dados[0].dia_dev);
+        sprintf(data2, "%i", ((p_carro->status.dados)+0)->dia_dev);
         sprintf(data2 + strlen(data2), "/");
-        sprintf(data2 + strlen(data2), "%i", p_carro->status.dados[0].mes_dev);
-        printf("|%-6s|%-6s|%-8s|",data, data2, p_carro->status.dados[0].local_dev );
+        sprintf(data2 + strlen(data2), "%i", ((p_carro->status.dados)+0)->mes_dev);
+        printf("|%-6s|%-6s|%-8s|",data, data2, ((p_carro->status.dados)+0)->local_dev );
         
         char vazio[50] = "-------------------------";
         printf("%.-5s", vazio);
         printf("|%.-9s|%.-3s|%.-6s|%.-6s|%.-8s|",vazio, vazio, vazio, vazio, vazio);
     }
     if(p_carro->status.car.sigla=='R'){
-        printf("|%-5c|%-9s", 'A', p_carro->status.dados[0].local_ret);
+        printf("|%-5c|%-9s", 'A', ((p_carro->status.dados)+0)->local_ret);
 
-        printf("|%-3i",p_carro->status.dados[0].reg_cli);
+        printf("|%-3i",((p_carro->status.dados)+0)->reg_cli);
         char data[6];
-        sprintf(data, "%i", p_carro->status.dados[0].dia_ret);
+        sprintf(data, "%i", ((p_carro->status.dados)+0)->dia_ret);
         sprintf(data + strlen(data), "/");
-        sprintf(data + strlen(data), "%i", p_carro->status.dados[0].mes_ret);
+        sprintf(data + strlen(data), "%i", ((p_carro->status.dados)+0)->mes_ret);
         char data2[6];
-        sprintf(data2, "%i", p_carro->status.dados[0].dia_dev);
+        sprintf(data2, "%i", ((p_carro->status.dados)+0)->dia_dev);
         sprintf(data2 + strlen(data2), "/");
-        sprintf(data2 + strlen(data2), "%i", p_carro->status.dados[0].mes_dev);
-        printf("|%-6s|%-6s|%-8s",data, data2, p_carro->status.dados[0].local_dev );
-        printf("|%-5c|%-9s", 'R', p_carro->status.dados[1].local_ret);
-        printf("|%-3i",p_carro->status.dados[1].reg_cli);
+        sprintf(data2 + strlen(data2), "%i", ((p_carro->status.dados)+0)->mes_dev);
+        printf("|%-6s|%-6s|%-8s",data, data2, ((p_carro->status.dados)+0)->local_dev );
+        printf("|%-5c|%-9s", 'R', ((p_carro->status.dados)+1)->local_ret);
+        printf("|%-3i",((p_carro->status.dados)+1)->reg_cli);
         char data3[6];
-        sprintf(data3, "%i", p_carro->status.dados[1].dia_ret);
+        sprintf(data3, "%i", ((p_carro->status.dados)+1)->dia_ret);
         sprintf(data3 + strlen(data3), "/");
-        sprintf(data3 + strlen(data3), "%i", p_carro->status.dados[1].mes_ret);
+        sprintf(data3 + strlen(data3), "%i", ((p_carro->status.dados)+1)->mes_ret);
         char data4[6];
-        sprintf(data4, "%i", p_carro->status.dados[1].dia_dev);
+        sprintf(data4, "%i", ((p_carro->status.dados)+1)->dia_dev);
         sprintf(data4 + strlen(data4), "/");
-        sprintf(data4 + strlen(data4), "%i", p_carro->status.dados[1].mes_dev);
-        printf("|%-6s|%-6s|%-8s|",data3, data4, p_carro->status.dados[1].local_dev );
+        sprintf(data4 + strlen(data4), "%i", ((p_carro->status.dados)+1)->mes_dev);
+        printf("|%-6s|%-6s|%-8s|",data3, data4, ((p_carro->status.dados)+1)->local_dev );
     }
 }   
 
@@ -636,14 +636,14 @@ void altera(carro *p_carro, int reg_car, cliente *p_cli){
     int pos = reg_car-1;
 
     //Esses prints perdidos é para debugging
-    //p_carro->status.dados[0].sigla = valor_da_sigla_anterior;
+    //((p_carro->status.dados)+0)->sigla = valor_da_sigla_anterior;
     //if(valor_da_sigla_anterior=='R'){
-    //    strcpy(p_carro->status.dados[1].local_dev, "Sorocaba");
-    //    strcpy(p_carro->status.dados[1].local_ret, "Sorocaba");
+    //    strcpy(((p_carro->status.dados)+1)->local_dev, "Sorocaba");
+    //    strcpy(((p_carro->status.dados)+1)->local_ret, "Sorocaba");
     //}
     //if(valor_da_sigla_anterior=='L'){
-    //    strcpy(p_carro->status.dados[0].local_dev, "Sorocaba");
-    //    strcpy(p_carro->status.dados[0].local_ret, "Sorocaba");
+    //    strcpy(((p_carro->status.dados)+0)->local_dev, "Sorocaba");
+    //    strcpy(((p_carro->status.dados)+0)->local_ret, "Sorocaba");
     //}
     
 
@@ -764,8 +764,8 @@ void consulta_de_teste(carro *p_carro)
         {
             fseek(ar,i*sizeof(carro),0);
             fread(p_carro,sizeof(carro),1,ar);
-            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, p_carro->status.dados[0].sigla);
-            printf("\nCliente: %i", p_carro->status.dados[0].reg_cli);
+            printf("\nRegistro do Carro: %i\nModelo: %s\nTipo: %c\nDiaria: %f\nStatus: %c", p_carro->reg_car, p_carro->modelo, p_carro->tipo, p_carro->diaria, ((p_carro->status.dados)+0)->sigla);
+            printf("\nCliente: %i", ((p_carro->status.dados)+0)->reg_cli);
         }
     }
 }
@@ -900,7 +900,7 @@ else
      {
       fseek(fptr,i*sizeof(carro),0);
       fread(p_carro,sizeof(carro),1,fptr);
-      if(p_carro->status.dados[0].reg_cli==reg_cli)
+      if(((p_carro->status.dados)+0)->reg_cli==reg_cli)
         {
          achou=i;
          i=qreg;  //forca a saida do for
@@ -927,7 +927,7 @@ int devolucao(carro *p_carro, cliente *p_cli) {
         printf("\nCarro com registro não encontrado");
         return -1;
     }
-    if(p_carro->status.dados[0].reg_cli != p_cli->reg_cli){
+    if(((p_carro->status.dados)+0)->reg_cli != p_cli->reg_cli){
         printf("\nRegistro de cliente do aluguel não bate com registro do cliente");
         return -1;
     }
@@ -937,21 +937,21 @@ int devolucao(carro *p_carro, cliente *p_cli) {
     if(p_carro->status.car.sigla == 'R'){
         p_carro->status.car.sigla = 'A';
 
-        p_carro->status.dados[0].dia_dev = p_carro->status.dados[1].dia_dev;
-        p_carro->status.dados[0].mes_dev = p_carro->status.dados[1].mes_dev;
-        strcpy(p_carro->status.dados[0].local_ret,p_carro->status.dados[1].local_ret);
-        strcpy(p_carro->status.dados[0].local_dev,p_carro->status.dados[1].local_dev);
-        p_carro->status.dados[0].dia_ret = p_carro->status.dados[1].dia_ret;
-        p_carro->status.dados[0].mes_ret = p_carro->status.dados[1].mes_ret;
-        p_carro->status.dados[0].reg_cli = p_carro->status.dados[1].reg_cli;
+        ((p_carro->status.dados)+0)->dia_dev = ((p_carro->status.dados)+1)->dia_dev;
+        ((p_carro->status.dados)+0)->mes_dev = ((p_carro->status.dados)+1)->mes_dev;
+        strcpy(((p_carro->status.dados)+0)->local_ret,((p_carro->status.dados)+1)->local_ret);
+        strcpy(((p_carro->status.dados)+0)->local_dev,((p_carro->status.dados)+1)->local_dev);
+        ((p_carro->status.dados)+0)->dia_ret = ((p_carro->status.dados)+1)->dia_ret;
+        ((p_carro->status.dados)+0)->mes_ret = ((p_carro->status.dados)+1)->mes_ret;
+        ((p_carro->status.dados)+0)->reg_cli = ((p_carro->status.dados)+1)->reg_cli;
 
         //A sigla está dando erro, parece que a sigla de dados[1] não recebe os valores
-        //p_carro->status.dados[0].sigla = p_carro->status.dados[1].sigla;
+        //((p_carro->status.dados)+0)->sigla = ((p_carro->status.dados)+1)->sigla;
     }
     else
     {
         p_carro->status.car.sigla = 'L';
-        strcpy(p_carro->status.car.local_ret,p_carro->status.dados[0].local_dev);
+        strcpy(p_carro->status.car.local_ret,((p_carro->status.dados)+0)->local_dev);
     }
     altera(p_carro, p_cli->reg_car, p_cli);
 
@@ -959,54 +959,54 @@ int devolucao(carro *p_carro, cliente *p_cli) {
 }
 
 void colocaDadosDeCarro(carro *p_carro,cliente *p_cli, int pos){
-    if (pos==0) p_carro->status.dados[pos].sigla = 'A';
-    if (pos==1) p_carro->status.dados[pos].sigla = 'R';
-    p_carro->status.dados[pos].reg_cli = p_cli->reg_cli;
+    if (pos==0) ((p_carro->status.dados)+pos)->sigla = 'A';
+    if (pos==1) ((p_carro->status.dados)+pos)->sigla = 'R';
+    ((p_carro->status.dados)+pos)->reg_cli = p_cli->reg_cli;
 
     if(pos==1){
-        p_carro->status.dados[1].dia_ret = p_carro->status.dados[0].dia_dev + 1 ;
+        ((p_carro->status.dados)+1)->dia_ret = ((p_carro->status.dados)+0)->dia_dev + 1 ;
 
         //Parte que virifica se a data não passa de 30 e 12 para dia e mes
     
-        if(p_carro->status.dados[1].dia_ret > 30){
-            p_carro->status.dados[1].dia_ret = 1;
-            p_carro->status.dados[1].mes_ret +=1;
+        if(((p_carro->status.dados)+1)->dia_ret > 30){
+            ((p_carro->status.dados)+1)->dia_ret = 1;
+            ((p_carro->status.dados)+1)->mes_ret +=1;
         }
 
-        if(p_carro->status.dados[1].mes_ret > 12){
-            p_carro->status.dados[1].mes_ret = 1;
+        if(((p_carro->status.dados)+1)->mes_ret > 12){
+            ((p_carro->status.dados)+1)->mes_ret = 1;
         }
 
-        strcpy(p_carro->status.dados[1].local_ret,p_carro->status.dados[0].local_dev);
+        strcpy(((p_carro->status.dados)+1)->local_ret,((p_carro->status.dados)+0)->local_dev);
 
     }else{
         int dia_ret;
         printf("\nDia de retirada: ");
         dia_ret = escolhe_entre_numeros(1,30);
-        p_carro->status.dados[pos].dia_ret = dia_ret;
+        ((p_carro->status.dados)+pos)->dia_ret = dia_ret;
 
         int mes_ret;
         printf("\nMes de retirada: ");
         mes_ret=escolhe_entre_numeros(1,12);
-        p_carro->status.dados[pos].mes_ret = mes_ret;
+        ((p_carro->status.dados)+pos)->mes_ret = mes_ret;
 
-        strcpy(p_carro->status.dados[0].local_ret, p_carro->status.car.local_ret);
+        strcpy(((p_carro->status.dados)+0)->local_ret, p_carro->status.car.local_ret);
     }
 
 
     int dia_dev;
     printf("\nDia de devolucao: ");
     dia_dev=escolhe_entre_numeros(1,30);
-    p_carro->status.dados[pos].dia_dev = dia_dev;
+    ((p_carro->status.dados)+pos)->dia_dev = dia_dev;
 
     int mes_dev;
     printf("\nMes de devolucao: ");
     mes_dev=escolhe_entre_numeros(1,12);
     fflush(stdin);
-    p_carro->status.dados[pos].mes_dev = mes_dev;
+    ((p_carro->status.dados)+pos)->mes_dev = mes_dev;
     
     printf("\nEscolha uma cidade para devolver o carro: ");
-    strcpy(p_carro->status.dados[pos].local_dev , escolheCidade());
+    strcpy(((p_carro->status.dados)+pos)->local_dev , escolheCidade());
 }
 
 void consulta_total_vip(vip *p_vip){
@@ -1057,15 +1057,15 @@ int calculaDiasEntreDatas(int dia, int mes, carro *p_carro){
     int dias_utilizados;
 
 //A diaria vai ser mais barata nos meses de 31 dias
-    if(p_carro->status.dados[0].mes_ret > mes){ // isso leva em consideração devolução no ano seguinte
-        int total_dias_ate_ano_novo = 360 -((p_carro->status.dados[0].mes_ret) -1 )*30 - p_carro->status.dados[0].dia_ret;
+    if(((p_carro->status.dados)+0)->mes_ret > mes){ // isso leva em consideração devolução no ano seguinte
+        int total_dias_ate_ano_novo = 360 -((((p_carro->status.dados)+0)->mes_ret) -1 )*30 - ((p_carro->status.dados)+0)->dia_ret;
         int dias_ate_dev_ano_atual = (mes-1)*30 + dia; 
         
         dias_utilizados = total_dias_ate_ano_novo + dias_ate_dev_ano_atual;
         
     } else {
-        int dias_mes = (mes-(p_carro->status.dados[0].mes_ret)) * 30;
-        int entreDias = dia - p_carro->status.dados[0].dia_ret;
+        int dias_mes = (mes-(((p_carro->status.dados)+0)->mes_ret)) * 30;
+        int entreDias = dia - ((p_carro->status.dados)+0)->dia_ret;
 
         dias_utilizados = dias_mes +entreDias;
     }
@@ -1086,7 +1086,7 @@ float calculaValorAPagar(carro *p_carro){
 
     float multa = 0;
     int dias_ate_dev = calculaDiasEntreDatas(dia_retorno, mes_retorno, p_carro);
-    int dias_ate_multa = calculaDiasEntreDatas(p_carro->status.dados[0].dia_dev,p_carro->status.dados[0].mes_dev, p_carro);
+    int dias_ate_multa = calculaDiasEntreDatas(((p_carro->status.dados)+0)->dia_dev,((p_carro->status.dados)+0)->mes_dev, p_carro);
     int dias_utilizados;
     if(dias_ate_multa < dias_ate_dev){
         printf("\nMULTA APLICADA");
@@ -1135,4 +1135,16 @@ void header_carro(){
     printf("%-8s|", "LDev");
     printf("%-1s|%-9s|%-1s|%-6s|%-6s|", "Sigla","LRet","Cli","Ret","Dev");
     printf("%-8s|", "LDev");
+}
+
+int escolhe_dia_baseado_mes(int mes){
+    if(mes == 2){
+        return 28;
+    }
+
+    if(mes == 1 || mes == 3 || mes == 5 || mes == 7 || mes == 9 || mes == 11){
+        return 31;
+    }
+
+    return 30;
 }
